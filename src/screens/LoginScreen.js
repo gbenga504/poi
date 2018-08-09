@@ -9,6 +9,7 @@ import Form from "../components/Login/Form";
 import Footer from "../components/Login/Footer";
 import Colors from "../assets/Colors";
 import { AuthUtils } from "../utils";
+import { MediumText } from "../components/AppText";
 
 export default class LoginScreen extends React.PureComponent {
   state = {
@@ -51,24 +52,26 @@ export default class LoginScreen extends React.PureComponent {
 
   render() {
     return (
-      <View style={styles.container}>
-        <Container>
-          <StatusBar />
-          <LayoutContainer style={styles.layoutContainer}>
-            <Content>
-              <Form
-                onUpdateUsername={val => this.updateFields(val, "username")}
-                onUpdateName={val => this.updateFields(val, "fullname")}
-                onUpdatePassword={val => this.updateFields(val, "password")}
-              />
-            </Content>
-            <Footer
-              onLogin={this.login}
-              loginActive={this.state.isLoginActive}
+      <Container style={styles.container}>
+        <StatusBar />
+        <LayoutContainer style={styles.layoutContainer}>
+          <Content>
+            <Form
+              onUpdateUsername={val => this.updateFields(val, "username")}
+              onUpdateName={val => this.updateFields(val, "fullname")}
+              onUpdatePassword={val => this.updateFields(val, "password")}
             />
-          </LayoutContainer>
-        </Container>
-      </View>
+            <MediumText style={styles.text}>Or</MediumText>
+            <MediumText
+              style={{ ...styles.text, ...styles.register }}
+              onPress={() => this.props.navigation.navigate("registerScreen")}
+            >
+              Not Registered ? Sign Up as a Student
+            </MediumText>
+          </Content>
+          <Footer onLogin={this.login} loginActive={this.state.isLoginActive} />
+        </LayoutContainer>
+      </Container>
     );
   }
 }
@@ -80,5 +83,14 @@ const styles = {
   },
   layoutContainer: {
     justifyContent: "space-between"
+  },
+  text: {
+    color: "#fff",
+    textAlign: "center",
+    fontSize: 16,
+    marginTop: 15
+  },
+  register: {
+    textDecorationLine: "underline"
   }
 };

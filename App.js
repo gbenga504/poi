@@ -13,6 +13,7 @@ import InceptionScreen from "./src/screens/InceptionScreen";
 import ProjectCreateScreen from "./src/screens/ProjectCreateScreen";
 import ViewLocation from "./src/screens/LocationScreen/ViewLocation";
 import AddLocation from "./src/screens/LocationScreen/AddLocation";
+import RegisterStudentScreen from "./src/screens/RegisterStudentScreen";
 
 const customTransition = (index, position) => {
   const inputRange = [index - 1, index, index + 1];
@@ -56,6 +57,9 @@ const Routes = StackNavigator(
     },
     addLocation: {
       screen: AddLocation
+    },
+    registerScreen: {
+      screen: RegisterStudentScreen
     }
   },
   {

@@ -6,19 +6,19 @@ import DashboardScreen from "./DashboardScreen";
 
 export default class InceptionScreen extends React.PureComponent {
   state = {
-    isLoading: true,
-    component: null
+    isLoading: false,
+    component: "login"
   };
 
-  componentWillMount() {
-    AsyncStorage.getItem("jwt", (error, value) => {
-      if (value && value !== null && !error) {
-        this.setComponentToRender("dashboard");
-      } else {
-        this.setComponentToRender("login");
-      }
-    });
-  }
+  // componentWillMount() {
+  //   AsyncStorage.getItem("jwt", (error, value) => {
+  //     if (value && value !== null && !error) {
+  //       this.setComponentToRender("dashboard");
+  //     } else {
+  //       this.setComponentToRender("login");
+  //     }
+  //   });
+  // }
 
   setComponentToRender = component => {
     this.setState({ isLoading: false, component: component });
