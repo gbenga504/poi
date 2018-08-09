@@ -13,7 +13,11 @@ const InteractiveList = props => {
     return (
       <ScrollView>
         {props.dataArray.map((list, i) => (
-          <InteractionHandler key={i} buttons={props.actionButtons}>
+          <InteractionHandler
+            key={i}
+            buttons={props.actionButtons}
+            onPress={() => props.onPress(list)}
+          >
             <Grid style={styles.listContainer}>
               <Col style={styles.listAvatar}>
                 <BoldText style={styles.listAvatarText}>
@@ -54,7 +58,8 @@ InteractiveList.propTypes = {
       name: PropTypes.string.isRequired,
       onPress: PropTypes.func.isRequired
     })
-  ).isRequired
+  ).isRequired,
+  onPress: PropTypes.func
 };
 
 const styles = {

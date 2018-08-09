@@ -11,6 +11,8 @@ import { Root } from "native-base";
 
 import InceptionScreen from "./src/screens/InceptionScreen";
 import ProjectCreateScreen from "./src/screens/ProjectCreateScreen";
+import ViewLocation from "./src/screens/LocationScreen/ViewLocation";
+import AddLocation from "./src/screens/LocationScreen/AddLocation";
 
 const customTransition = (index, position) => {
   const inputRange = [index - 1, index, index + 1];
@@ -48,6 +50,12 @@ const Routes = StackNavigator(
     },
     projectCreate: {
       screen: ProjectCreateScreen
+    },
+    viewLocation: {
+      screen: ViewLocation
+    },
+    addLocation: {
+      screen: AddLocation
     }
   },
   {

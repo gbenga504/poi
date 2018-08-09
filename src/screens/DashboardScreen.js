@@ -32,6 +32,10 @@ export default class DashboardScreen extends React.PureComponent {
       { name: "Ajaone", description: "8 locations" },
       { name: "Hiskul", description: "5 locations" }
     ];
+    let {
+      navigation: { navigate }
+    } = this.props;
+
     return (
       <View style={styles.container}>
         <Container>
@@ -39,6 +43,7 @@ export default class DashboardScreen extends React.PureComponent {
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
               dataArray={PROJECTS}
+              onPress={() => navigate("viewLocation")}
               renderNullItem="No Projects Added Yet"
               actionButtons={this.generateActionButtons()}
             />
