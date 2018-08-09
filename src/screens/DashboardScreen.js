@@ -1,6 +1,5 @@
 import React from "react";
 import { View, AsyncStorage } from "react-native";
-import PropTypes from "prop-types";
 import { Container } from "native-base";
 
 import LayoutContainer from "../containers/LayoutContainer";
@@ -28,6 +27,7 @@ export default class DashboardScreen extends React.PureComponent {
       { name: "Ajaone", description: "8 locations" },
       { name: "Hiskul", description: "5 locations" }
     ];
+
     let {
       navigation: { navigate }
     } = this.props;
@@ -39,12 +39,14 @@ export default class DashboardScreen extends React.PureComponent {
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
               dataArray={PROJECTS}
-              onPress={() => navigate("viewLocation")}
+              onPress={() => navigate("viewGroups")}
               renderNullItem="No Projects Added Yet"
               actionButtons={this.generateActionButtons()}
             />
           </LayoutContainer>
           <AppFab
+            name="group-add"
+            type="MaterialIcons"
             onPress={() => this.props.navigation.navigate("projectCreate")}
           />
         </Container>

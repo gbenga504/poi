@@ -18,6 +18,8 @@ import SelectAccountTypeScreen from "./src/screens/SelectAccountTypeScreen";
 import StudentLogin from "./src/screens/LoginScreen/StudentLogin";
 import LecturerLogin from "./src/screens/LoginScreen/LecturerLogin";
 import DashboardScreen from "./src/screens/DashboardScreen";
+import ViewGroups from "./src/screens/GroupScreen/ViewGroups";
+import CreateGroup from "./src/screens/GroupScreen/CreateGroup";
 
 const customTransition = (index, position) => {
   const inputRange = [index - 1, index, index + 1];
@@ -76,6 +78,12 @@ const Routes = StackNavigator(
     },
     lecturerLogin: {
       screen: LecturerLogin
+    },
+    viewGroups: {
+      screen: ViewGroups
+    },
+    createGroup: {
+      screen: CreateGroup
     }
   },
   {
