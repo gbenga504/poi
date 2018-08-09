@@ -34,6 +34,11 @@ export default class ViewLocation extends React.PureComponent {
             />
           </LayoutContainer>
         </Content>
+        <AppFab
+          name="add-location"
+          type="MaterialIcons"
+          onPress={() => this.props.navigation.navigate("addLocation")}
+        />
       </Container>
     );
   }
