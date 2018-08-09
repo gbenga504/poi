@@ -7,7 +7,7 @@ import Button from "../Button";
 import Colors from "../../assets/Colors";
 
 const FlatButton = props => (
-  <Button>
+  <Button onPress={props.onPress}>
     <View onPress={props.onPress} style={{ ...styles.button, ...props.style }}>
       <MediumText style={{ ...styles.title, ...props.titleStyle }}>
         {props.title}
@@ -31,7 +31,8 @@ const styles = {
 FlatButton.propTypes = {
   title: PropTypes.string,
   style: PropTypes.object,
-  titleStyle: PropTypes.object
+  titleStyle: PropTypes.object,
+  onPress: PropTypes.func
 };
 
 export default FlatButton;

@@ -17,6 +17,7 @@ export default class RegisterStudentScreen extends React.PureComponent {
   render() {
     return (
       <Container style={styles.container}>
+        <StatusBar />
         <Content>
           <LayoutContainer>
             <BoldText style={styles.title}>Create a Student account</BoldText>

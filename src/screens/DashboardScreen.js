@@ -9,14 +9,10 @@ import AppFab from "../components/AppFab";
 import InteractiveList from "../components/InteractiveList";
 
 export default class DashboardScreen extends React.PureComponent {
-  static propTypes = {
-    onLogout: PropTypes.func.isRequired
-  };
-
   logout = () => {
-    AsyncStorage.removeItem("jwt", error => {
+    AsyncStorage.multiRemove(["jwt", "@userType"], error => {
       if (!error) {
-        this.props.onLogout("login");
+        this.props.navigation.navigate("selectAccount");
       } else {
         alert("Could not log user out, try again");
       }

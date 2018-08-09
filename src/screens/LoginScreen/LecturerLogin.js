@@ -3,43 +3,40 @@ import { View, AsyncStorage } from "react-native";
 import { Container, Content } from "native-base";
 import PropTypes from "prop-types";
 
-import LayoutContainer from "../containers/LayoutContainer";
-import StatusBar from "../components/StatusBar";
-import Form from "../components/Login/Form";
-import Footer from "../components/Login/Footer";
-import Colors from "../assets/Colors";
-import { AuthUtils } from "../utils";
-import { MediumText } from "../components/AppText";
+import LayoutContainer from "../../containers/LayoutContainer";
+import StatusBar from "../../components/StatusBar";
+import Form from "../../components/Login/Form";
+import Footer from "../../components/Login/Footer";
+import Colors from "../../assets/Colors";
+import { AuthUtils } from "../../utils";
+import { MediumText } from "../../components/AppText";
 
-export default class LoginScreen extends React.PureComponent {
+export default class LecturerLogin extends React.PureComponent {
   state = {
     userAuthDetails: {
       username: "",
-      fullname: "",
       password: ""
     },
     isLoading: false,
     isLoginActive: false
   };
 
-  static propTypes = {
-    onLogin: PropTypes.func.isRequired
-  };
-
   login = () => {
-    AsyncStorage.setItem("jwt", "aRandomData", error => {
-      if (error) {
-        alert("error in logging");
-      } else {
-        this.props.onLogin("main");
+    AsyncStorage.multiSet(
+      [["jwt", "aRandomData"], ["@userType", "lecturer"]],
+      error => {
+        if (error) {
+          alert("error in logging");
+        } else {
+          this.props.navigation.navigate("dashboard", { type: "lecturer" });
+        }
       }
-    });
+    );
   };
 
   updateFields = (value, field) => {
     let { userAuthDetails } = this.state;
     let isLoginActive = AuthUtils.loginValidation(
-      userAuthDetails.fullname,
       userAuthDetails.username,
       userAuthDetails.password
     );
@@ -58,16 +55,9 @@ export default class LoginScreen extends React.PureComponent {
           <Content>
             <Form
               onUpdateUsername={val => this.updateFields(val, "username")}
-              onUpdateName={val => this.updateFields(val, "fullname")}
               onUpdatePassword={val => this.updateFields(val, "password")}
+              hideFullNameField
             />
-            <MediumText style={styles.text}>Or</MediumText>
-            <MediumText
-              style={{ ...styles.text, ...styles.register }}
-              onPress={() => this.props.navigation.navigate("registerScreen")}
-            >
-              Not Registered ? Sign Up as a Student
-            </MediumText>
           </Content>
           <Footer onLogin={this.login} loginActive={this.state.isLoginActive} />
         </LayoutContainer>

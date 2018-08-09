@@ -18,9 +18,10 @@ export default class Form extends React.PureComponent {
   };
 
   static propTypes = {
-    onUpdateName: PropTypes.func.isRequired,
+    onUpdateName: PropTypes.func,
     onUpdateUsername: PropTypes.func.isRequired,
-    onUpdatePassword: PropTypes.func.isRequired
+    onUpdatePassword: PropTypes.func.isRequired,
+    hideFullNameField: PropTypes.bool
   };
 
   /**
@@ -36,11 +37,15 @@ export default class Form extends React.PureComponent {
     return (
       <View>
         <BoldText style={styles.title}>Log In</BoldText>
-        <MediumText style={styles.inputTitle}>FULL NAME</MediumText>
-        <AppTextInput
-          onChangeText={this.props.onUpdateName}
-          style={styles.textInput}
-        />
+        {!this.props.hideFullNameField && (
+          <React.Fragment>
+            <MediumText style={styles.inputTitle}>FULL NAME</MediumText>
+            <AppTextInput
+              onChangeText={this.props.onUpdateName}
+              style={styles.textInput}
+            />
+          </React.Fragment>
+        )}
         <MediumText style={styles.inputTitle}>USER NAME</MediumText>
         <AppTextInput
           onChangeText={this.props.onUpdateUsername}
