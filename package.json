@@ -7,8 +7,18 @@
     "test": "jest"
   },
   "dependencies": {
+    "appcenter": "^1.7.1",
+    "appcenter-analytics": "^1.7.1",
+    "appcenter-crashes": "^1.7.1",
+    "moment": "^2.22.2",
+    "native-base": "^2.7.2",
     "react": "16.3.1",
-    "react-native": "0.55.4"
+    "react-native": "0.55.4",
+    "react-native-vector-icons": "^5.0.0",
+    "react-navigation": "1.0.0-beta.21",
+    "react-redux": "^5.0.7",
+    "redux": "^4.0.0",
+    "redux-logger": "^3.0.6"
   },
   "devDependencies": {
     "babel-jest": "23.4.2",
@@ -17,6 +27,11 @@
     "react-test-renderer": "16.3.1"
   },
   "jest": {
-    "preset": "react-native"
+    "preset": "react-native",
+    "setupFiles": [
+      "<rootDir>\\node_modules\\appcenter-analytics\\test\\AppCenterAnalyticsMock.js",
+      "<rootDir>\\node_modules\\appcenter\\test\\AppCenterMock.js",
+      "<rootDir>\\node_modules\\appcenter-crashes\\test\\AppCenterCrashesMock.js"
+    ]
   }
 }

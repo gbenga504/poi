@@ -4,55 +4,60 @@
  * @flow
  */
 
-import React, { Component } from 'react';
-import {
-  Platform,
-  StyleSheet,
-  Text,
-  View
-} from 'react-native';
+import React from "react";
+import { Dimensions } from "react-native";
+import { StackNavigator } from "react-navigation";
+import { Root } from "native-base";
 
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-  android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+import InceptionScreen from "./src/screens/InceptionScreen";
+import ProjectCreateScreen from "./src/screens/ProjectCreateScreen";
 
-type Props = {};
-export default class App extends Component<Props> {
-  render() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.welcome}>
-          Welcome to React Native!
-        </Text>
-        <Text style={styles.instructions}>
-          To get started, edit App.js
-        </Text>
-        <Text style={styles.instructions}>
-          {instructions}
-        </Text>
-      </View>
-    );
+const customTransition = (index, position) => {
+  const inputRange = [index - 1, index, index + 1];
+  const outputRange = [
+    Dimensions.get("window").width,
+    0,
+    -Dimensions.get("window").width
+  ];
+
+  const translateX = position.interpolate({
+    inputRange,
+    outputRange
+  });
+
+  return {
+    transform: [{ translateX }]
+  };
+};
+
+let TransitionConfiguration = () => {
+  return {
+    screenInterpolator: sceneProps => {
+      const { position, scene } = sceneProps;
+      const { index } = scene;
+
+      return customTransition(index, position);
+    }
+  };
+};
+
+const Routes = StackNavigator(
+  {
+    inception: {
+      screen: InceptionScreen
+    },
+    projectCreate: {
+      screen: ProjectCreateScreen
+    }
+  },
+  {
+    navigationOptions: { header: null },
+    transitionConfig: TransitionConfiguration
   }
-}
+);
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
+export default () => (
+  <Root>
+    <Routes />
+  </Root>
+);
