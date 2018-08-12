@@ -35,7 +35,7 @@ export default class DashboardScreen extends React.PureComponent {
     return (
       <View style={styles.container}>
         <Container>
-          <AppHeader />
+          <AppHeader navigation={this.props.navigation} />
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
               dataArray={PROJECTS}
