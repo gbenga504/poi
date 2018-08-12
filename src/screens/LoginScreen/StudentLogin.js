@@ -56,8 +56,8 @@ export default class StudentLogin extends React.PureComponent {
         <LayoutContainer style={styles.layoutContainer}>
           <Content>
             <Form
+              userNamePlaceholder="MATRIC NUMBER"
               onUpdateUsername={val => this.updateFields(val, "username")}
-              onUpdateName={val => this.updateFields(val, "fullname")}
               onUpdatePassword={val => this.updateFields(val, "password")}
             />
             <MediumText style={styles.text}>Or</MediumText>

@@ -28,7 +28,7 @@ export default class SelectAccountTypeScreen extends React.PureComponent {
           <View style={styles.container}>
             <View style={styles.body}>
               <MediumText style={styles.text}>Select Account Type</MediumText>
-              <MediumText style={styles.text}> I am a: </MediumText>
+              <MediumText style={styles.text}>Are you a:</MediumText>
               <FlatButton
                 style={styles.appButton}
                 onPress={() => this.setUserType("lecturer")}

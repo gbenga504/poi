@@ -1,11 +1,19 @@
 import React from "react";
-import { Container, Content, Icon, Input, Item, View } from "native-base";
+import {
+  Container,
+  Content,
+  Icon,
+  Input,
+  Item,
+  View,
+  Radio
+} from "native-base";
 import { Picker, StyleSheet } from "react-native";
 
 import LayoutContainer from "../containers/LayoutContainer";
 import StatusBar from "../components/StatusBar";
 import Colors from "../assets/Colors";
-import { BoldText } from "../components/AppText";
+import { BoldText, MediumText } from "../components/AppText";
 import { FlatButton } from "../components/AppButton";
 
 export default class RegisterStudentScreen extends React.PureComponent {
@@ -82,6 +90,31 @@ export default class RegisterStudentScreen extends React.PureComponent {
                 style={styles.textInput}
               />
             </Item>
+            <View style={{ ...styles.genderContainer, marginTop: 20 }}>
+              <MediumText style={{ ...styles.genderText, marginLeft: 0 }}>
+                Gender:
+              </MediumText>
+              <View style={styles.gender}>
+                <View style={styles.genderContainer}>
+                  <Radio
+                    selected={false}
+                    selectedColor="#fff"
+                    color="#fff"
+                    onPress={() => null}
+                  />
+                  <MediumText style={styles.genderText}>Male</MediumText>
+                </View>
+                <View style={{ ...styles.genderContainer, marginLeft: 15 }}>
+                  <Radio
+                    selected={false}
+                    color="#fff"
+                    selectedColor="#fff"
+                    onPress={() => null}
+                  />
+                  <MediumText style={styles.genderText}>Female</MediumText>
+                </View>
+              </View>
+            </View>
             <Item style={styles.inputContainer}>
               <Icon active name="md-lock" style={styles.inputIcon} />
               <Input
@@ -130,8 +163,7 @@ const styles = {
     paddingBottom: 0,
     marginTop: 20,
     borderBottomColor: "#fff",
-    paddingBottom: 0,
-    marginTop: 20
+    paddingBottom: 0
   },
   inputContainer: {
     marginTop: 20
@@ -150,5 +182,19 @@ const styles = {
     justifyContent: "center",
     marginVertical: 15,
     flexDirection: "row"
+  },
+  genderContainer: {
+    flexDirection: "row",
+    alignItems: "center"
+  },
+  genderText: {
+    marginLeft: 10,
+    color: "#fff",
+    fontSize: 16
+  },
+  gender: {
+    marginLeft: 10,
+    flexDirection: "row",
+    justifyContent: "space-between"
   }
 };
