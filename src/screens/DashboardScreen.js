@@ -1,13 +1,27 @@
 import React from "react";
 import { View, AsyncStorage } from "react-native";
 import { Container } from "native-base";
+import { connect } from "react-redux";
 
 import LayoutContainer from "../containers/LayoutContainer";
 import AppHeader from "../components/AppHeader";
 import AppFab from "../components/AppFab";
 import InteractiveList from "../components/InteractiveList";
 
-export default class DashboardScreen extends React.PureComponent {
+class DashboardScreen extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    let { userType } = props;
+
+    this.project =
+      userType == "lecturer"
+        ? [
+            { name: "RSG 301", description: "8 Groups" },
+            { name: "RSG 201", description: "5 Groups" }
+          ]
+        : [{ name: "RSG 201", description: "5 Groups" }];
+  }
+
   logout = () => {
     AsyncStorage.multiRemove(["jwt", "@userType"], error => {
       if (!error) {
@@ -23,13 +37,9 @@ export default class DashboardScreen extends React.PureComponent {
   ];
 
   render() {
-    const PROJECTS = [
-      { name: "RSG 301", description: "8 Groups" },
-      { name: "RSG 201", description: "5 Groups" }
-    ];
-
     let {
-      navigation: { navigate }
+      navigation: { navigate },
+      userType
     } = this.props;
 
     return (
@@ -38,22 +48,36 @@ export default class DashboardScreen extends React.PureComponent {
           <AppHeader navigation={this.props.navigation} pageTitle="Dashboard" />
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
-              dataArray={PROJECTS}
+              dataArray={this.project}
               onPress={() => navigate("viewGroups")}
               renderNullItem="No Projects Added Yet"
-              actionButtons={this.generateActionButtons()}
+              actionButtons={
+                userType == "lecturer"
+                  ? this.generateActionButtons()
+                  : () => null
+              }
             />
           </LayoutContainer>
-          <AppFab
-            name="group-add"
-            type="MaterialIcons"
-            onPress={() => this.props.navigation.navigate("projectCreate")}
-          />
+          {userType == "lecturer" && (
+            <AppFab
+              name="group-add"
+              type="MaterialIcons"
+              onPress={() => this.props.navigation.navigate("projectCreate")}
+            />
+          )}
         </Container>
       </View>
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    userType: state.userType
+  };
+}
+
+export default connect(mapStateToProps)(DashboardScreen);
 
 const styles = {
   container: {
