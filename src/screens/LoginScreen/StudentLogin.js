@@ -2,6 +2,7 @@ import React from "react";
 import { View, AsyncStorage } from "react-native";
 import { Container, Content } from "native-base";
 import PropTypes from "prop-types";
+import { NavigationActions } from "react-navigation";
 
 import LayoutContainer from "../../containers/LayoutContainer";
 import StatusBar from "../../components/StatusBar";
@@ -10,8 +11,9 @@ import Footer from "../../components/Login/Footer";
 import Colors from "../../assets/Colors";
 import { AuthUtils } from "../../utils";
 import { MediumText } from "../../components/AppText";
+import ReduxContext from "../../context/ReduxContext";
 
-export default class StudentLogin extends React.PureComponent {
+class StudentLogin extends React.PureComponent {
   state = {
     userAuthDetails: {
       username: "",
@@ -23,13 +25,29 @@ export default class StudentLogin extends React.PureComponent {
   };
 
   login = () => {
+    let {
+      screenProps: { setJwt, setUserType },
+      navigation
+    } = this.props;
+
     AsyncStorage.multiSet(
-      [["jwt", "aRandomData"], ["@userType", "student"]],
+      [["jwt", "add_jwt_here"], ["@userType", "student"]],
       error => {
-        if (error) {
-          alert("error in logging");
-        } else {
-          this.props.navigation.navigate("dashboard", { type: "student" });
+        if (!error) {
+          setJwt("add_jwt_here");
+          setUserType("student");
+
+          navigation.dispatch(
+            NavigationActions.reset({
+              index: 0,
+              key: null,
+              actions: [
+                NavigationActions.navigate({
+                  routeName: "dashboard"
+                })
+              ]
+            })
+          );
         }
       }
     );
@@ -74,6 +92,14 @@ export default class StudentLogin extends React.PureComponent {
     );
   }
 }
+
+const _StudentLogin = props => (
+  <ReduxContext.Consumer>
+    {({ screenProps }) => <StudentLogin {...props} screenProps={screenProps} />}
+  </ReduxContext.Consumer>
+);
+
+export default _StudentLogin;
 
 const styles = {
   container: {

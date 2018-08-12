@@ -1,42 +1,47 @@
 import React from "react";
-import { AsyncStorage } from "react-native";
 import { NavigationActions } from "react-navigation";
+import { connect } from "react-redux";
 
-export default class InceptionScreen extends React.PureComponent {
+class InceptionScreen extends React.PureComponent {
   componentDidMount() {
-    let { navigation } = this.props;
+    let { navigation, userType } = this.props;
 
-    AsyncStorage.getItem("@userType", (error, type) => {
-      if (error || !type) {
-        navigation.dispatch(
-          NavigationActions.reset({
-            index: 0,
-            key: null,
-            actions: [
-              NavigationActions.navigate({
-                routeName: "selectAccount"
-              })
-            ]
-          })
-        );
-      } else {
-        navigation.dispatch(
-          NavigationActions.reset({
-            index: 0,
-            key: null,
-            actions: [
-              NavigationActions.navigate({
-                routeName: "dashboard",
-                params: { type }
-              })
-            ]
-          })
-        );
-      }
-    });
+    if (!userType) {
+      navigation.dispatch(
+        NavigationActions.reset({
+          index: 0,
+          key: null,
+          actions: [
+            NavigationActions.navigate({
+              routeName: "selectAccount"
+            })
+          ]
+        })
+      );
+    } else {
+      navigation.dispatch(
+        NavigationActions.reset({
+          index: 0,
+          key: null,
+          actions: [
+            NavigationActions.navigate({
+              routeName: "dashboard"
+            })
+          ]
+        })
+      );
+    }
   }
 
   render() {
     return null;
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    userType: state.userType
+  };
+}
+
+export default connect(mapStateToProps)(InceptionScreen);

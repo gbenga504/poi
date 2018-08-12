@@ -2,6 +2,7 @@ import React from "react";
 import { View, AsyncStorage } from "react-native";
 import { Container, Content } from "native-base";
 import PropTypes from "prop-types";
+import { NavigationActions } from "react-navigation";
 
 import LayoutContainer from "../../containers/LayoutContainer";
 import StatusBar from "../../components/StatusBar";
@@ -10,8 +11,9 @@ import Footer from "../../components/Login/Footer";
 import Colors from "../../assets/Colors";
 import { AuthUtils } from "../../utils";
 import { MediumText } from "../../components/AppText";
+import ReduxContext from "../../context/ReduxContext";
 
-export default class LecturerLogin extends React.PureComponent {
+class LecturerLogin extends React.PureComponent {
   state = {
     userAuthDetails: {
       username: "",
@@ -22,13 +24,29 @@ export default class LecturerLogin extends React.PureComponent {
   };
 
   login = () => {
+    let {
+      screenProps: { setJwt, setUserType },
+      navigation
+    } = this.props;
+
     AsyncStorage.multiSet(
-      [["jwt", "aRandomData"], ["@userType", "lecturer"]],
+      [["jwt", "add_jwt_here"], ["@userType", "lecturer"]],
       error => {
-        if (error) {
-          alert("error in logging");
-        } else {
-          this.props.navigation.navigate("dashboard", { type: "lecturer" });
+        if (!error) {
+          setJwt("add_jwt_here");
+          setUserType("lecturer");
+
+          navigation.dispatch(
+            NavigationActions.reset({
+              index: 0,
+              key: null,
+              actions: [
+                NavigationActions.navigate({
+                  routeName: "dashboard"
+                })
+              ]
+            })
+          );
         }
       }
     );
@@ -65,6 +83,16 @@ export default class LecturerLogin extends React.PureComponent {
     );
   }
 }
+
+const _LecturerLogin = props => (
+  <ReduxContext.Consumer>
+    {({ screenProps }) => (
+      <LecturerLogin {...props} screenProps={screenProps} />
+    )}
+  </ReduxContext.Consumer>
+);
+
+export default _LecturerLogin;
 
 const styles = {
   container: {

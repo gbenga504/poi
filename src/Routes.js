@@ -1,25 +1,22 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
- */
-
 import React from "react";
 import { Dimensions } from "react-native";
 import { StackNavigator } from "react-navigation";
-import { Root } from "native-base";
+import { connect } from "react-redux";
+import { bindActionCreators } from "redux";
 
-import InceptionScreen from "./src/screens/InceptionScreen";
-import ProjectCreateScreen from "./src/screens/ProjectCreateScreen";
-import ViewLocation from "./src/screens/LocationScreen/ViewLocation";
-import AddLocation from "./src/screens/LocationScreen/AddLocation";
-import RegisterStudentScreen from "./src/screens/RegisterStudentScreen";
-import SelectAccountTypeScreen from "./src/screens/SelectAccountTypeScreen";
-import StudentLogin from "./src/screens/LoginScreen/StudentLogin";
-import LecturerLogin from "./src/screens/LoginScreen/LecturerLogin";
-import DashboardScreen from "./src/screens/DashboardScreen";
-import ViewGroups from "./src/screens/GroupScreen/ViewGroups";
-import CreateGroup from "./src/screens/GroupScreen/CreateGroup";
+import { ActionCreators } from "./actions";
+import InceptionScreen from "./screens/InceptionScreen";
+import ProjectCreateScreen from "./screens/ProjectCreateScreen";
+import ViewLocation from "./screens/LocationScreen/ViewLocation";
+import AddLocation from "./screens/LocationScreen/AddLocation";
+import RegisterStudentScreen from "./screens/RegisterStudentScreen";
+import SelectAccountTypeScreen from "./screens/SelectAccountTypeScreen";
+import StudentLogin from "./screens/LoginScreen/StudentLogin";
+import LecturerLogin from "./screens/LoginScreen/LecturerLogin";
+import DashboardScreen from "./screens/DashboardScreen";
+import ViewGroups from "./screens/GroupScreen/ViewGroups";
+import CreateGroup from "./screens/GroupScreen/CreateGroup";
+import ReduxContext from "./context/ReduxContext";
 
 const customTransition = (index, position) => {
   const inputRange = [index - 1, index, index + 1];
@@ -92,8 +89,28 @@ const Routes = StackNavigator(
   }
 );
 
-export default () => (
-  <Root>
-    <Routes />
-  </Root>
-);
+function mapDispatchToProps(dispatch) {
+  return bindActionCreators(ActionCreators, dispatch);
+}
+
+class RoutesAdvanced extends React.PureComponent {
+  constructor(props) {
+    super(props);
+    this.state = {
+      screenProps: props.screenProps
+    };
+  }
+
+  render() {
+    return (
+      <ReduxContext.Provider value={this.state}>
+        <Routes />
+      </ReduxContext.Provider>
+    );
+  }
+}
+
+export default connect(
+  () => ({}),
+  mapDispatchToProps
+)(props => <RoutesAdvanced screenProps={props} />);

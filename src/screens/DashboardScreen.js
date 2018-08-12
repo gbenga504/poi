@@ -24,8 +24,8 @@ export default class DashboardScreen extends React.PureComponent {
 
   render() {
     const PROJECTS = [
-      { name: "Ajaone", description: "8 locations" },
-      { name: "Hiskul", description: "5 locations" }
+      { name: "RSG 301", description: "8 Groups" },
+      { name: "RSG 201", description: "5 Groups" }
     ];
 
     let {
@@ -35,7 +35,7 @@ export default class DashboardScreen extends React.PureComponent {
     return (
       <View style={styles.container}>
         <Container>
-          <AppHeader navigation={this.props.navigation} />
+          <AppHeader navigation={this.props.navigation} pageTitle="Dashboard" />
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
               dataArray={PROJECTS}

@@ -8,18 +8,27 @@ import { NavigationActions } from "react-navigation";
 import { BoldText } from "./AppText";
 import Fonts from "../assets/Fonts";
 import Colors from "../assets/Colors";
+import ReduxContext from "../context/ReduxContext";
 
-export default class AppHeader extends Component {
+class AppHeader extends Component {
   static propTypes = {
     right: PropTypes.element,
     left: PropTypes.element,
     title: PropTypes.string,
-    navigation: PropTypes.object
+    navigation: PropTypes.object,
+    pageTitle: PropTypes.string
   };
 
   logout = () => {
+    let {
+      screenProps: { setJwt, setUserType }
+    } = this.props;
+
     AsyncStorage.multiRemove(["@userType", "jwt"])
       .then(data => {
+        setJwt(null);
+        setUserType(null);
+
         this.props.navigation.dispatch(
           NavigationActions.reset({
             index: 0,
@@ -36,7 +45,7 @@ export default class AppHeader extends Component {
   };
 
   render() {
-    let { left, title, right } = this.props;
+    let { left, title, right, pageTitle } = this.props;
     return (
       <Header androidStatusBarColor={Colors.statusBar} style={styles.container}>
         <Left>
@@ -45,9 +54,13 @@ export default class AppHeader extends Component {
           ) : (
             <View style={styles.left}>
               <View style={styles.avatar}>
-                <BoldText style={styles.avatarText}>G</BoldText>
+                <BoldText style={styles.avatarText}>
+                  {pageTitle && pageTitle[0].toUpperCase()}
+                </BoldText>
               </View>
-              <BoldText style={styles.name}>GAD</BoldText>
+              <BoldText style={styles.name}>
+                {pageTitle && pageTitle.toUpperCase()}
+              </BoldText>
             </View>
           )}
         </Left>
@@ -73,13 +86,22 @@ export default class AppHeader extends Component {
   }
 }
 
+const _AppHeader = props => (
+  <ReduxContext.Consumer>
+    {({ screenProps }) => <AppHeader {...props} screenProps={screenProps} />}
+  </ReduxContext.Consumer>
+);
+
+export default _AppHeader;
+
 const styles = {
   container: {
     backgroundColor: Colors.defaultThemeColor
   },
   left: {
     flexDirection: "row",
-    alignItems: "center"
+    alignItems: "center",
+    width: 150
   },
   avatar: {
     width: 40,
