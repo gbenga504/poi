@@ -1,53 +1,104 @@
 import React from "react";
 import { Content, Container, Item, Input } from "native-base";
 import { View } from "react-native";
+import { connect } from "react-redux";
 
 import LayoutContainer from "../../containers/LayoutContainer";
 import AppHeader from "../../components/AppHeader";
 import { MediumText } from "../../components/AppText";
 
-export default class AddLocation extends React.PureComponent {
+class AddLocation extends React.PureComponent {
+  save = () => {
+    //@Todo, save the data and route to the Location screen
+  };
+
   render() {
+    let { userType } = this.props;
+
     return (
       <Container>
-        <AppHeader right={<MediumText style={styles.save}>Save</MediumText>} />
+        <AppHeader
+          navigation={this.props.navigation}
+          pageTitle="Location"
+          right={
+            <MediumText onPress={this.save} style={styles.save}>
+              Save
+            </MediumText>
+          }
+        />
         <Content>
           <LayoutContainer style={styles.bodyContainer}>
             <Item>
-              <Input placeholder="Enter a location Number" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter a location Number"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Latitude" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Latitude"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Longitude" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Longitude"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Elevation" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Elevation"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Address/Reference" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Address/Reference"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Feature Type" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Feature Type"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter a Rock Type" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter a Rock Type"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Mineralogy" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Mineralogy"
+              />
             </Item>
             <Item>
-              <Input placeholder="Ente Description" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Strike"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Strike" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Dip"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Dip" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Enter Structural Trend"
+              />
             </Item>
             <Item>
-              <Input placeholder="Enter Structural Trend" />
+              <Input
+                editable={userType == "lecturer" ? false : true}
+                placeholder="Ente Description"
+              />
             </Item>
           </LayoutContainer>
         </Content>
@@ -55,6 +106,14 @@ export default class AddLocation extends React.PureComponent {
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    userType: state.userType
+  };
+}
+
+export default connect(mapStateToProps)(AddLocation);
 
 const styles = {
   container: {

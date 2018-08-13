@@ -15,8 +15,8 @@ const InteractiveList = props => {
         {props.dataArray.map((list, i) => (
           <InteractionHandler
             key={i}
-            buttons={props.actionButtons}
-            onPress={() => props.onPress(list)}
+            buttons={props.actionButtons(list)}
+            onPress={() => props.onPress(props.items[i])}
           >
             <Grid style={styles.listContainer}>
               <Col style={styles.listAvatar}>
@@ -30,6 +30,11 @@ const InteractiveList = props => {
                   {list.description}
                 </RegularText>
               </Col>
+              {list.tag && (
+                <View style={styles.tagContainer}>
+                  <BoldText style={styles.tag}>{list.tag}</BoldText>
+                </View>
+              )}
             </Grid>
           </InteractionHandler>
         ))}
@@ -48,17 +53,23 @@ const InteractiveList = props => {
 
 InteractiveList.propTypes = {
   renderNullItem: PropTypes.string.isRequired,
+  items: PropTypes.array,
   dataArray: PropTypes.arrayOf(
     PropTypes.shape({
-      name: PropTypes.name
+      name: PropTypes.name,
+      description: PropTypes.description,
+      tag: PropTypes.number
     })
   ).isRequired,
-  actionButtons: PropTypes.arrayOf(
-    PropTypes.shape({
-      name: PropTypes.string.isRequired,
-      onPress: PropTypes.func.isRequired
-    })
-  ).isRequired,
+  actionButtons: PropTypes.oneOfType(
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        name: PropTypes.string.isRequired,
+        onPress: PropTypes.func.isRequired
+      })
+    ),
+    PropTypes.func
+  ),
   onPress: PropTypes.func
 };
 
@@ -99,6 +110,23 @@ const styles = {
     fontSize: Fonts.listHeaderSize,
     color: Colors.listHeaderColor,
     marginLeft: 20
+  },
+  tagContainer: {
+    position: "absolute",
+    right: 15,
+    top: 15,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "teal",
+    borderRadius: 5,
+    width: 30,
+    height: 20
+  },
+  tag: {
+    color: "#fff",
+    fontSize: 13,
+    textAlign: "center"
   }
 };
 

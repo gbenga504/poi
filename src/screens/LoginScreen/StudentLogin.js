@@ -31,7 +31,7 @@ class StudentLogin extends React.PureComponent {
     } = this.props;
 
     AsyncStorage.multiSet(
-      [["jwt", "add_jwt_here"], ["@userType", "student"]],
+      [["@jwt", "add_jwt_here"], ["@userType", "student"]],
       error => {
         if (!error) {
           setJwt("add_jwt_here");

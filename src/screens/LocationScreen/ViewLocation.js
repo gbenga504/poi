@@ -1,15 +1,20 @@
 import React from "react";
 import { Content, Container } from "native-base";
+import { connect } from "react-redux";
 
 import LayoutContainer from "../../containers/LayoutContainer";
 import AppHeader from "../../components/AppHeader";
 import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
 
-export default class ViewLocation extends React.PureComponent {
-  generateActionButtons = () => [
-    { name: "Delete", onPress: () => alert("deleted") }
-  ];
+class ViewLocation extends React.PureComponent {
+  generateActionButtons = location => {
+    if (this.props.userType == "lecturer") {
+      return [];
+    } else {
+      return [{ name: "Delete", onPress: () => alert("deleted") }];
+    }
+  };
 
   render() {
     const LOCATIONS = [
@@ -18,31 +23,49 @@ export default class ViewLocation extends React.PureComponent {
     ];
 
     let {
-      navigation: { navigate }
+      navigation: {
+        navigate,
+        state: {
+          params: {
+            group: { name }
+          }
+        }
+      }
     } = this.props;
 
     return (
       <Container style={styles.container}>
-        <AppHeader />
+        <AppHeader pageTitle={name} navigation={this.props.navigation} />
         <Content>
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
               dataArray={LOCATIONS}
-              onPress={() => navigate("addLocation")}
+              items={LOCATIONS}
+              onPress={location => navigate("addLocation", { location })}
               renderNullItem="No Location Added Yet"
-              actionButtons={this.generateActionButtons()}
+              actionButtons={list => this.generateActionButtons(list)}
             />
           </LayoutContainer>
         </Content>
-        <AppFab
-          name="add-location"
-          type="MaterialIcons"
-          onPress={() => this.props.navigation.navigate("addLocation")}
-        />
+        {this.props.userType != "lecturer" && (
+          <AppFab
+            name="add-location"
+            type="MaterialIcons"
+            onPress={() => this.props.navigation.navigate("addLocation")}
+          />
+        )}
       </Container>
     );
   }
 }
+
+function mapStateToProps(state) {
+  return {
+    userType: state.userType
+  };
+}
+
+export default connect(mapStateToProps)(ViewLocation);
 
 const styles = {
   container: {

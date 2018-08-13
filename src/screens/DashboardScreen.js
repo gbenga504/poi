@@ -7,33 +7,50 @@ import LayoutContainer from "../containers/LayoutContainer";
 import AppHeader from "../components/AppHeader";
 import AppFab from "../components/AppFab";
 import InteractiveList from "../components/InteractiveList";
+import ReduxContext from "../context/ReduxContext";
+
+const PROJECTS = [{ name: "RSG 201", description: "5 Groups" }];
 
 class DashboardScreen extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    let { userType } = props;
-
-    this.project =
-      userType == "lecturer"
-        ? [
-            { name: "RSG 301", description: "8 Groups" },
-            { name: "RSG 201", description: "5 Groups" }
-          ]
-        : [{ name: "RSG 201", description: "5 Groups" }];
-  }
-
-  logout = () => {
-    AsyncStorage.multiRemove(["jwt", "@userType"], error => {
-      if (!error) {
-        this.props.navigation.navigate("selectAccount");
-      } else {
-        alert("Could not log user out, try again");
-      }
-    });
+  formatProject = () => {
+    let { userType, projects } = this.props;
+    if (userType == "lecturer") {
+      return projects.map(project => {
+        return {
+          name: project.name,
+          description: `${project.groups.length} Groups`
+        };
+      });
+    } else {
+      //@Todo replace with the project from the server after formatting
+      //Or alternatively load projects from server in componentDidMount and save in async and also send to redux
+      return PROJECTS;
+    }
   };
 
-  generateActionButtons = () => [
-    { name: "Delete", onPress: () => alert("deleted") }
+  deleteProject = project => {
+    let {
+        projects,
+        screenProps: { setProjects }
+      } = this.props,
+      _newProjects = projects.filter((_project, i) => {
+        return _project.name != project.name;
+      });
+    AsyncStorage.setItem("@projects", JSON.stringify(_newProjects)).then(
+      data => {
+        setProjects(_newProjects);
+
+        ToastAndroid.showWithGravity(
+          `Project ${project.name} deleted`,
+          ToastAndroid.SHORT,
+          ToastAndroid.CENTER
+        );
+      }
+    );
+  };
+
+  generateActionButtons = project => [
+    { name: "Delete", onPress: () => this.deleteProject(project) }
   ];
 
   render() {
@@ -48,13 +65,14 @@ class DashboardScreen extends React.PureComponent {
           <AppHeader navigation={this.props.navigation} pageTitle="Dashboard" />
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
-              dataArray={this.project}
-              onPress={() => navigate("viewGroups")}
+              dataArray={this.formatProject()}
+              items={userType != "lecturer" ? PROJECTS : this.props.projects}
+              onPress={project => navigate("viewGroups", { project })}
               renderNullItem="No Projects Added Yet"
               actionButtons={
                 userType == "lecturer"
-                  ? this.generateActionButtons()
-                  : () => null
+                  ? list => this.generateActionButtons(list)
+                  : () => []
               }
             />
           </LayoutContainer>
@@ -73,11 +91,20 @@ class DashboardScreen extends React.PureComponent {
 
 function mapStateToProps(state) {
   return {
-    userType: state.userType
+    userType: state.userType,
+    projects: state.projects
   };
 }
 
-export default connect(mapStateToProps)(DashboardScreen);
+const _DashboardScreen = props => (
+  <ReduxContext.Consumer>
+    {({ screenProps }) => (
+      <DashboardScreen {...props} screenProps={screenProps} />
+    )}
+  </ReduxContext.Consumer>
+);
+
+export default connect(mapStateToProps)(_DashboardScreen);
 
 const styles = {
   container: {

@@ -21,3 +21,25 @@ export const userType = (state = null, action) => {
       break;
   }
 };
+
+export const projects = (state = [], action) => {
+  switch (action.type) {
+    case types.SET_PROJECTS:
+      return action.projects;
+      break;
+    default:
+      return state;
+      break;
+  }
+};
+
+export const groups = (state = [], action) => {
+  switch (action.type) {
+    case types.SET_GROUPS:
+      return action.groups;
+      break;
+    default:
+      return state;
+      break;
+  }
+};

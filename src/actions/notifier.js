@@ -9,3 +9,13 @@ export const setUserType = userType => ({
   type: types.SET_USER_TYPE,
   userType
 });
+
+export const setProjects = projects => ({
+  type: types.SET_PROJECTS,
+  projects
+});
+
+export const setGroups = groups => ({
+  type: types.SET_GROUPS,
+  groups
+});
