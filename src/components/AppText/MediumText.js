@@ -8,5 +8,5 @@ export default props => (
 );
 
 const styles = {
-  fontFamily: "Roboto-Medium"
+  // fontFamily: "Roboto-Medium"
 };

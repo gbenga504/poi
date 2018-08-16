@@ -7,9 +7,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "appcenter": "^1.7.1",
-    "appcenter-analytics": "^1.7.1",
-    "appcenter-crashes": "^1.7.1",
     "moment": "^2.22.2",
     "native-base": "^2.7.2",
     "react": "16.3.1",
@@ -32,7 +29,10 @@
     "setupFiles": [
       "<rootDir>\\node_modules\\appcenter-analytics\\test\\AppCenterAnalyticsMock.js",
       "<rootDir>\\node_modules\\appcenter\\test\\AppCenterMock.js",
-      "<rootDir>\\node_modules\\appcenter-crashes\\test\\AppCenterCrashesMock.js"
+      "<rootDir>\\node_modules\\appcenter-crashes\\test\\AppCenterCrashesMock.js",
+      "<rootDir>/node_modules/appcenter/test/AppCenterMock.js",
+      "<rootDir>/node_modules/appcenter-analytics/test/AppCenterAnalyticsMock.js",
+      "<rootDir>/node_modules/appcenter-crashes/test/AppCenterCrashesMock.js"
     ]
   }
 }

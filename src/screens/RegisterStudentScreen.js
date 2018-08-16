@@ -174,7 +174,7 @@ const styles = {
   },
   textInput: {
     color: "#fff",
-    fontFamily: "Quicksand-Medium"
+    // fontFamily: "Quicksand-Medium"
   },
   picker: { color: "#fff", marginLeft: -5 },
   registerButton: {

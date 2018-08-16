@@ -48,7 +48,7 @@ const styles = {
     flex: 1,
     paddingVertical: 0,
     paddingLeft: 0,
-    fontFamily: "Roboto-Regular",
+    // fontFamily: "Roboto-Regular",
     borderBottomWidth: 0.5,
     borderBottomColor: Colors.defaultThemeColor,
     color: Colors.listContentColor,
