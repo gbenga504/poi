@@ -19,9 +19,11 @@
 {
   NSURL *jsCodeLocation;
 
-  // [AppCenterReactNativeAnalytics registerWithInitiallyEnabled:true];  // Initialize AppCenter analytics
+  [AppCenterReactNative register];  // Initialize AppCenter 
 
-  // [AppCenterReactNativeCrashes registerWithAutomaticProcessing];  // Initialize AppCenter crashes
+  [AppCenterReactNativeAnalytics registerWithInitiallyEnabled:true];  // Initialize AppCenter analytics
+
+  [AppCenterReactNativeCrashes registerWithAutomaticProcessing];  // Initialize AppCenter crashes
 
   // [AppCenterReactNative register];  // Initialize AppCenter
 
