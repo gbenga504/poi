@@ -5,10 +5,10 @@ import {
   UIManager,
   Platform,
   AsyncStorage,
-  ToastAndroid
+
 } from "react-native";
 import PropTypes from "prop-types";
-import { Container, Content } from "native-base";
+import { Container, Content, Toast } from "native-base";
 import { connect } from "react-redux";
 import { NavigationActions } from "react-navigation";
 
@@ -39,11 +39,10 @@ class ProjectCreateScreen extends React.PureComponent {
     AsyncStorage.setItem("@projects", JSON.stringify(_newProjects)).then(
       result => {
         screenProps.setProjects(_newProjects);
-        ToastAndroid.showWithGravity(
-          `Project ${projectName} added`,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER
-        );
+        Toast.show({
+          text: `Project ${projectName} added`,
+          buttonText: "okay"
+        });
 
         navigation.dispatch(
           NavigationActions.reset({

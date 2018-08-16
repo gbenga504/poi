@@ -1,6 +1,6 @@
 import React from "react";
 import { View, AsyncStorage } from "react-native";
-import { Container } from "native-base";
+import { Container, Toast } from "native-base";
 import { connect } from "react-redux";
 
 import LayoutContainer from "../containers/LayoutContainer";
@@ -40,11 +40,10 @@ class DashboardScreen extends React.PureComponent {
       data => {
         setProjects(_newProjects);
 
-        ToastAndroid.showWithGravity(
-          `Project ${project.name} deleted`,
-          ToastAndroid.SHORT,
-          ToastAndroid.CENTER
-        );
+        Toast.show({
+          text: `Project ${project.name} deleted`,
+          buttonText: 'Okay'
+        })
       }
     );
   };

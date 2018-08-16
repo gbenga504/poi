@@ -1,7 +1,7 @@
 import React from "react";
 import { View, AsyncStorage, ToastAndroid } from "react-native";
 import PropTypes from "prop-types";
-import { Container, Content } from "native-base";
+import { Container, Content, Toast } from "native-base";
 import { connect } from "react-redux";
 import { NavigationActions } from "react-navigation";
 
@@ -77,12 +77,10 @@ class CreateGroup extends React.PureComponent {
     ]).then(result => {
       setGroups(_groups);
       setProjects(_projects);
-
-      ToastAndroid.showWithGravity(
-        `Group Created Successfully`,
-        ToastAndroid.SHORT,
-        ToastAndroid.CENTER
-      );
+      Toast.show({
+        text: `Group Created Successfully`,
+        buttonText: "Okay"
+      });
 
       navigation.dispatch(
         NavigationActions.reset({
