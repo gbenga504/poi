@@ -6,9 +6,9 @@ import {
   Input,
   Item,
   View,
-  Radio
+  Toast
 } from "native-base";
-import { Picker, StyleSheet } from "react-native";
+import { StyleSheet, AsyncStorage } from "react-native";
 
 import LayoutContainer from "../containers/LayoutContainer";
 import StatusBar from "../components/StatusBar";
@@ -18,8 +18,37 @@ import { FlatButton } from "../components/AppButton";
 
 export default class RegisterStudentScreen extends React.PureComponent {
   state = {
-    department: "",
-    level: ""
+    name: "",
+    matricNumber: "",
+    phoneNumber: "",
+    password: "",
+    passwordConfirmation: ""
+  };
+
+  save = async () => {
+    if (
+      this.state.matricNumber &&
+      this.state.password &&
+      this.state.passwordConfirmation &&
+      this.state.password == this.state.passwordConfirmation
+    ) {
+      const students = await AsyncStorage.getItem("@students");
+      let parsedStudents = [];
+      if (students) {
+        parsedStudents = JSON.parse(students);
+      }
+      parsedStudents = [...parsedStudents, { ...this.state }];
+      await AsyncStorage.setItem("@students", JSON.stringify(parsedStudents));
+      Toast.show({
+        text: "Registration Successful",
+        buttonText: ""
+      });
+      this.props.navigation.navigate("studentLogin");
+    } else {
+      Toast.show({
+        text: "Registration failed, please fill all input fields"
+      });
+    }
   };
 
   render() {
@@ -35,9 +64,10 @@ export default class RegisterStudentScreen extends React.PureComponent {
                 placeholder="Name"
                 placeholderTextColor="#fff"
                 style={styles.textInput}
+                onChangeText={val => this.setState({ name: val })}
               />
             </Item>
-            <View style={styles.pickerContainer}>
+            {/* <View style={styles.pickerContainer}>
               <Picker
                 mode="dialog"
                 style={styles.picker}
@@ -64,16 +94,17 @@ export default class RegisterStudentScreen extends React.PureComponent {
                 <Picker.Item label="400" value="400" />
                 <Picker.Item label="500" value="500" />
               </Picker>
-            </View>
+            </View> */}
             <Item style={styles.inputContainer}>
               <Icon active name="md-person" style={styles.inputIcon} />
               <Input
                 placeholder="Matric Number"
                 placeholderTextColor="#fff"
                 style={styles.textInput}
+                onChangeText={val => this.setState({ matricNumber: val })}
               />
             </Item>
-            <Item style={styles.inputContainer}>
+            {/* <Item style={styles.inputContainer}>
               <Icon active name="md-mail" style={styles.inputIcon} />
               <Input
                 placeholder="Email"
@@ -89,8 +120,8 @@ export default class RegisterStudentScreen extends React.PureComponent {
                 placeholderTextColor="#fff"
                 style={styles.textInput}
               />
-            </Item>
-            <View style={{ ...styles.genderContainer, marginTop: 20 }}>
+            </Item> */}
+            {/* <View style={{ ...styles.genderContainer, marginTop: 20 }}>
               <MediumText style={{ ...styles.genderText, marginLeft: 0 }}>
                 Gender:
               </MediumText>
@@ -114,7 +145,7 @@ export default class RegisterStudentScreen extends React.PureComponent {
                   <MediumText style={styles.genderText}>Female</MediumText>
                 </View>
               </View>
-            </View>
+            </View> */}
             <Item style={styles.inputContainer}>
               <Icon active name="md-lock" style={styles.inputIcon} />
               <Input
@@ -122,6 +153,7 @@ export default class RegisterStudentScreen extends React.PureComponent {
                 secureTextEntry={true}
                 placeholderTextColor="#fff"
                 style={styles.textInput}
+                onChangeText={val => this.setState({ password: val })}
               />
             </Item>
             <Item style={styles.inputContainer}>
@@ -131,10 +163,13 @@ export default class RegisterStudentScreen extends React.PureComponent {
                 secureTextEntry={true}
                 placeholderTextColor="#fff"
                 style={styles.textInput}
+                onChangeText={val =>
+                  this.setState({ passwordConfirmation: val })
+                }
               />
             </Item>
             <View style={styles.registerButton}>
-              <FlatButton title="Create Account" />
+              <FlatButton title="Create Account" onPress={this.save} />
             </View>
           </LayoutContainer>
         </Content>
@@ -173,7 +208,7 @@ const styles = {
     marginLeft: 30
   },
   textInput: {
-    color: "#fff",
+    color: "#fff"
     // fontFamily: "Quicksand-Medium"
   },
   picker: { color: "#fff", marginLeft: -5 },

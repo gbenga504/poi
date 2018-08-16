@@ -24,7 +24,7 @@ class AppHeader extends Component {
       screenProps: { setJwt, setUserType }
     } = this.props;
 
-    AsyncStorage.multiRemove(["@userType", "@jwt", "@projects", "@groups"])
+    AsyncStorage.multiRemove(["@userType", "@jwt"])
       .then(data => {
         setJwt(null);
         setUserType(null);
