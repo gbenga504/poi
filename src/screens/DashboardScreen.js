@@ -31,17 +31,18 @@ class DashboardScreen extends React.PureComponent {
 
   getStudentProjects = async () => {
     let groups = await AsyncStorage.getItem("@groups");
+    const studentMatric = await AsyncStorage.getItem("@jwt");
     if (groups) {
-      const studentMatric = JSON.parse(await AsyncStorage.getItem("@jwt"));
-      groups = JSON.parse(groups);
-      groups = _.filter(groups, grp => {
-        return _.find(grp.students, { matricNumber: matricNumber });
+      const parsedGroups = _.filter(JSON.parse(groups), grp => {
+        return _.find(grp.students, { matric_no: studentMatric });
       });
-      if (groups) {
+      if (parsedGroups) {
+        let projects = parsedGroups.map(group => ({
+          name: group.projectName
+        }));
+        console.log("projects", projects);
         this.setState({
-          projects: groups.map(group => {
-            name: group.projectName;
-          })
+          projects: projects
         });
       }
     }

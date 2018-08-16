@@ -1,6 +1,13 @@
 import React from "react";
 import PropTypes from "prop-types";
-import { View, CheckBox, Modal, StyleSheet } from "react-native";
+import {
+  View,
+  CheckBox,
+  Modal,
+  StyleSheet,
+  AsyncStorage,
+  TouchableWithoutFeedback
+} from "react-native";
 import { Content } from "native-base";
 
 import { BoldText, MediumText } from "../AppText";
@@ -10,21 +17,31 @@ import Fonts from "../../assets/Fonts";
 import Button from "../Button";
 import AppFab from "../AppFab";
 
-const STUDENTS = [
-  { name: "Anifowoshe Gbenga David", matric_no: "Rsg/13/4987" },
-  { name: "Anifowoshe Toyin Naomi", matric_no: "Rsg/13/4933" },
-  { name: "Labelu Tobi", matric_no: "Rsg/13/4999" }
-];
-
 export default class ColleagueAddition extends React.PureComponent {
   state = {
-    addedStudent: {}
+    addedStudent: {},
+    students: []
   };
 
   static propTypes = {
     isVisible: PropTypes.bool.isRequired,
     onRequestClose: PropTypes.func.isRequired,
     onAddColleague: PropTypes.func.isRequired
+  };
+
+  componentDidMount() {
+    this.fetchSchoolStudents();
+  }
+  fetchSchoolStudents = async () => {
+    const students = await AsyncStorage.getItem("@students");
+    if (students) {
+      this.setState({
+        students: JSON.parse(students).map(std => ({
+          name: std.name,
+          matric_no: std.matricNumber
+        }))
+      });
+    }
   };
 
   setStudent = student => {
@@ -84,23 +101,29 @@ export default class ColleagueAddition extends React.PureComponent {
           <AppHeader left={this.renderCancelButton()} />
           <Content>
             <View style={styles.container}>
-              {STUDENTS.map((student, i) => (
-                <View style={styles.section} key={i}>
-                  <CheckBox
-                    value={
-                      this.state.addedStudent[student.matric_no] ? true : false
-                    }
-                    onValueChange={() => this.setStudent(student)}
-                  />
-                  <View styles={styles.nameContainer}>
-                    <BoldText style={{ ...styles.text, ...styles.name }}>
-                      {student.name}
-                    </BoldText>
-                    <MediumText style={styles.text}>
-                      {student.matric_no}
-                    </MediumText>
+              {this.state.students.map((student, i) => (
+                <TouchableWithoutFeedback
+                  onPress={() => this.setStudent(student)}
+                >
+                  <View style={styles.section} key={i}>
+                    <CheckBox
+                      value={
+                        this.state.addedStudent[student.matric_no]
+                          ? true
+                          : false
+                      }
+                      onValueChange={() => this.setStudent(student)}
+                    />
+                    <View styles={styles.nameContainer}>
+                      <BoldText style={{ ...styles.text, ...styles.name }}>
+                        {student.name}
+                      </BoldText>
+                      <MediumText style={styles.text}>
+                        {student.matric_no}
+                      </MediumText>
+                    </View>
                   </View>
-                </View>
+                </TouchableWithoutFeedback>
               ))}
             </View>
           </Content>

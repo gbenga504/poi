@@ -33,17 +33,6 @@ class ViewGroups extends React.PureComponent {
     } = this.props;
     this.projectGroups(name);
   }
-  formatGroup = () => {
-    let { userType } = this.props;
-    const { groups } = this.state;
-    if (userType == "lecturer") {
-      return groups;
-    } else {
-      //@Todo replace with the group from the server after formatting
-      //Or alternatively load groups from server in componentDidMount and save in async and also send to redux
-      return GROUPS;
-    }
-  };
 
   generateActionButtons = group => {
     let { userType } = this.props;
@@ -66,11 +55,22 @@ class ViewGroups extends React.PureComponent {
   };
 
   projectGroups = async projectName => {
+    let { userType } = this.props;
     let groups = await AsyncStorage.getItem("@groups");
-    if (groups) {
-      groups = JSON.parse(groups);
-      let projectGroups = _.filter(groups, { projectName: projectName });
+    if (userType == "lecturer" && groups) {
+      let projectGroups = _.filter(JSON.parse(groups), {
+        projectName: projectName
+      });
       this.setState({ groups: projectGroups || [] });
+    } else if (userType == "student" && groups) {
+      const studentMatric = await AsyncStorage.getItem("@jwt");
+      let projectGroups = _.filter(JSON.parse(groups), {
+        projectName: projectName
+      });
+      const studentGroups = _.filter(projectGroups, grp => {
+        return _.find(grp.students, { matric_no: studentMatric });
+      });
+      this.setState({ groups: studentGroups });
     }
   };
 
@@ -93,8 +93,8 @@ class ViewGroups extends React.PureComponent {
           <AppHeader pageTitle={name} navigation={this.props.navigation} />
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
-              dataArray={this.formatGroup()}
-              items={this.formatGroup()}
+              dataArray={this.state.groups}
+              items={this.state.groups}
               onPress={group => navigate("viewLocation", { group })}
               renderNullItem="No Groups Added Yet"
               actionButtons={list => this.generateActionButtons(list)}
