@@ -7,6 +7,7 @@ import LayoutContainer from "../../containers/LayoutContainer";
 import AppHeader from "../../components/AppHeader";
 import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
+import _ from "lodash";
 
 class ViewLocation extends React.PureComponent {
   state = {
@@ -31,13 +32,17 @@ class ViewLocation extends React.PureComponent {
       }
     } = this.props;
     let locations = await AsyncStorage.getItem("@locations");
+
     if (locations) {
-      locations = JSON.parse(locations);
-      let grouplocations = _.filter(locations, { groupName: group.name });
+      let grouplocations = _.filter(JSON.parse(locations), {
+        groupName: group.name
+      });
+      console.log("grouplocations", grouplocations);
       if (grouplocations) {
         grouplocations = grouplocations.map(location => {
           return {
             ...location,
+            name: location.locationNumber,
             description: `${group.students.length} students`,
             group
           };
@@ -76,7 +81,11 @@ class ViewLocation extends React.PureComponent {
           <AppFab
             name="add-location"
             type="MaterialIcons"
-            onPress={() => this.props.navigation.navigate("addLocation")}
+            onPress={() =>
+              this.props.navigation.navigate("addLocation", {
+                location: { groupName: name }
+              })
+            }
           />
         )}
       </Container>
