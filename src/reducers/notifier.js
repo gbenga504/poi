@@ -43,3 +43,14 @@ export const groups = (state = [], action) => {
       break;
   }
 };
+
+export const locations = (state = [], action) => {
+  switch (action.type) {
+    case types.SET_LOCATIONS:
+      return action.locations;
+      break;
+    default:
+      return state;
+      break;
+  }
+};

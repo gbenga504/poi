@@ -1,12 +1,13 @@
 import React from "react";
 import { Container } from "native-base";
-import { View } from "react-native";
+import { View, AsyncStorage } from "react-native";
 import { connect } from "react-redux";
 
 import LayoutContainer from "../../containers/LayoutContainer";
 import AppHeader from "../../components/AppHeader";
 import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
+import _ from "lodash";
 
 const GROUPS = [
   {
@@ -16,16 +17,27 @@ const GROUPS = [
 ];
 
 class ViewGroups extends React.PureComponent {
+  state = {
+    groups: []
+  };
+
+  componentDidMount() {
+    let {
+      navigation: {
+        state: {
+          params: {
+            project: { name }
+          }
+        }
+      }
+    } = this.props;
+    this.projectGroups(name);
+  }
   formatGroup = () => {
-    let { userType, groups } = this.props;
+    let { userType } = this.props;
+    const { groups } = this.state;
     if (userType == "lecturer") {
-      return groups.map(group => {
-        return {
-          name: group.name,
-          description: group.description,
-          tag: group.students.length
-        };
-      });
+      return groups;
     } else {
       //@Todo replace with the group from the server after formatting
       //Or alternatively load groups from server in componentDidMount and save in async and also send to redux
@@ -53,6 +65,15 @@ class ViewGroups extends React.PureComponent {
     }
   };
 
+  projectGroups = async projectName => {
+    let groups = await AsyncStorage.getItem("@groups");
+    if (groups) {
+      groups = JSON.parse(groups);
+      let projectGroups = _.filter(groups, { projectName: projectName });
+      this.setState({ groups: projectGroups || [] });
+    }
+  };
+
   render() {
     let {
       navigation: {
@@ -73,9 +94,7 @@ class ViewGroups extends React.PureComponent {
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
               dataArray={this.formatGroup()}
-              items={
-                this.props.userType != "lecturer" ? GROUPS : this.props.groups
-              }
+              items={this.formatGroup()}
               onPress={group => navigate("viewLocation", { group })}
               renderNullItem="No Groups Added Yet"
               actionButtons={list => this.generateActionButtons(list)}

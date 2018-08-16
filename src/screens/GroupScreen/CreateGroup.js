@@ -68,7 +68,13 @@ class CreateGroup extends React.PureComponent {
 
     let _groups = [
       ...groups,
-      { id: groupId, name: groupName, description: groupDescription, students }
+      {
+        id: groupId,
+        name: groupName,
+        description: groupDescription,
+        students,
+        projectName
+      }
     ];
 
     AsyncStorage.multiSet([
