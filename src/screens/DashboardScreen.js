@@ -8,23 +8,42 @@ import AppHeader from "../components/AppHeader";
 import AppFab from "../components/AppFab";
 import InteractiveList from "../components/InteractiveList";
 import ReduxContext from "../context/ReduxContext";
+import _ from "lodash";
 
 const PROJECTS = [{ name: "RSG 201", description: "5 Groups" }];
 
 class DashboardScreen extends React.PureComponent {
+  state = {
+    projects: []
+  };
+
+  componentDidMount() {
+    this.getStudentProjects();
+  }
   formatProject = () => {
     let { userType, projects } = this.props;
     if (userType == "lecturer") {
-      return projects.map(project => {
-        return {
-          name: project.name,
-          description: `${project.groups.length} Groups`
-        };
-      });
+      return projects;
     } else {
-      //@Todo replace with the project from the server after formatting
-      //Or alternatively load projects from server in componentDidMount and save in async and also send to redux
-      return PROJECTS;
+      return this.state.projects;
+    }
+  };
+
+  getStudentProjects = async () => {
+    let groups = await AsyncStorage.getItem("@groups");
+    if (groups) {
+      const studentMatric = JSON.parse(await AsyncStorage.getItem("@jwt"));
+      groups = JSON.parse(groups);
+      groups = _.filter(groups, grp => {
+        return _.find(grp.students, { matricNumber: matricNumber });
+      });
+      if (groups) {
+        this.setState({
+          projects: groups.map(group => {
+            name: group.projectName;
+          })
+        });
+      }
     }
   };
 
@@ -42,8 +61,8 @@ class DashboardScreen extends React.PureComponent {
 
         Toast.show({
           text: `Project ${project.name} deleted`,
-          buttonText: 'Okay'
-        })
+          buttonText: "Okay"
+        });
       }
     );
   };
@@ -65,7 +84,7 @@ class DashboardScreen extends React.PureComponent {
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
               dataArray={this.formatProject()}
-              items={userType != "lecturer" ? PROJECTS : this.props.projects}
+              items={this.formatProject()}
               onPress={project => navigate("viewGroups", { project })}
               renderNullItem="No Projects Added Yet"
               actionButtons={
