@@ -8,7 +8,7 @@ import {
   View,
   Toast
 } from "native-base";
-import { StyleSheet, AsyncStorage } from "react-native";
+import { StyleSheet, AsyncStorage, Picker } from "react-native";
 
 import LayoutContainer from "../containers/LayoutContainer";
 import StatusBar from "../components/StatusBar";
@@ -67,7 +67,7 @@ export default class RegisterStudentScreen extends React.PureComponent {
                 onChangeText={val => this.setState({ name: val })}
               />
             </Item>
-            {/* <View style={styles.pickerContainer}>
+            <View style={styles.pickerContainer}>
               <Picker
                 mode="dialog"
                 style={styles.picker}
@@ -94,7 +94,7 @@ export default class RegisterStudentScreen extends React.PureComponent {
                 <Picker.Item label="400" value="400" />
                 <Picker.Item label="500" value="500" />
               </Picker>
-            </View> */}
+            </View>
             <Item style={styles.inputContainer}>
               <Icon active name="md-person" style={styles.inputIcon} />
               <Input
