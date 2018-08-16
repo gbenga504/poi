@@ -1,6 +1,7 @@
 import React from "react";
 import { Content, Container } from "native-base";
 import { connect } from "react-redux";
+import { View, AsyncStorage } from "react-native";
 
 import LayoutContainer from "../../containers/LayoutContainer";
 import AppHeader from "../../components/AppHeader";
@@ -8,6 +9,9 @@ import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
 
 class ViewLocation extends React.PureComponent {
+  state = {
+    locations: []
+  };
   generateActionButtons = location => {
     if (this.props.userType == "lecturer") {
       return [];
@@ -15,13 +19,34 @@ class ViewLocation extends React.PureComponent {
       return [{ name: "Delete", onPress: () => alert("deleted") }];
     }
   };
-
+  componentDidMount() {
+    this.groupLocations();
+  }
+  groupLocations = async () => {
+    let {
+      navigation: {
+        state: {
+          params: { group }
+        }
+      }
+    } = this.props;
+    let locations = await AsyncStorage.getItem("@locations");
+    if (locations) {
+      locations = JSON.parse(locations);
+      let grouplocations = _.filter(locations, { groupName: group.name });
+      if (grouplocations) {
+        grouplocations = grouplocations.map(location => {
+          return {
+            ...location,
+            description: `${group.students.length} students`,
+            group
+          };
+        });
+      }
+      this.setState({ locations: grouplocations || [] });
+    }
+  };
   render() {
-    const LOCATIONS = [
-      { name: "Location 1", description: "8 students" },
-      { name: "Location 2", description: "5 students" }
-    ];
-
     let {
       navigation: {
         navigate,
@@ -39,8 +64,8 @@ class ViewLocation extends React.PureComponent {
         <Content>
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
-              dataArray={LOCATIONS}
-              items={LOCATIONS}
+              dataArray={this.state.locations}
+              items={this.state.locations}
               onPress={location => navigate("addLocation", { location })}
               renderNullItem="No Location Added Yet"
               actionButtons={list => this.generateActionButtons(list)}
