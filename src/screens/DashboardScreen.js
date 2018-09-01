@@ -9,25 +9,27 @@ import AppFab from "../components/AppFab";
 import InteractiveList from "../components/InteractiveList";
 import ReduxContext from "../context/ReduxContext";
 import _ from "lodash";
-
-const PROJECTS = [{ name: "RSG 201", description: "5 Groups" }];
+import { lecturerProjects } from "../api/assessment";
 
 class DashboardScreen extends React.PureComponent {
   state = {
     projects: []
   };
 
-  componentDidMount() {
-    this.getStudentProjects();
-  }
-  formatProject = () => {
-    let { userType, projects } = this.props;
+  async componentDidMount() {
+    const userType = await AsyncStorage.getItem("@userType");
     if (userType == "lecturer") {
-      return projects;
+      const response = await lecturerProjects();
+      if (response.data) {
+        const { data } = response.data;
+        this.setState({
+          projects: data.map(project => ({ name: project.title, ...project }))
+        });
+      }
     } else {
-      return this.state.projects;
+      await this.getStudentProjects();
     }
-  };
+  }
 
   getStudentProjects = async () => {
     let groups = await AsyncStorage.getItem("@groups");
@@ -84,8 +86,8 @@ class DashboardScreen extends React.PureComponent {
           <AppHeader navigation={this.props.navigation} pageTitle="Dashboard" />
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
-              dataArray={this.formatProject()}
-              items={this.formatProject()}
+              dataArray={this.state.projects}
+              items={this.state.projects}
               onPress={project => navigate("viewGroups", { project })}
               renderNullItem="No Projects Added Yet"
               actionButtons={
