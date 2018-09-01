@@ -1,7 +1,6 @@
 import React from "react";
 import { View, AsyncStorage } from "react-native";
-import { Container, Content } from "native-base";
-import PropTypes from "prop-types";
+import { Container, Content, Toast } from "native-base";
 import { NavigationActions } from "react-navigation";
 
 import LayoutContainer from "../../containers/LayoutContainer";
@@ -10,52 +9,71 @@ import Form from "../../components/Login/Form";
 import Footer from "../../components/Login/Footer";
 import Colors from "../../assets/Colors";
 import { AuthUtils } from "../../utils";
-import { MediumText } from "../../components/AppText";
 import ReduxContext from "../../context/ReduxContext";
+import { loginUser } from "../../api/accounts";
 
 class LecturerLogin extends React.PureComponent {
   state = {
     userAuthDetails: {
-      username: "",
+      email: "",
       password: ""
     },
     isLoading: false,
     isLoginActive: false
   };
 
-  login = () => {
-    let {
-      screenProps: { setJwt, setUserType },
-      navigation
-    } = this.props;
+  login = async () => {
+    const response = await loginUser({
+      email: this.state.userAuthDetails.email,
+      password: this.state.userAuthDetails.password
+    });
+    if (response.data) {
+      Toast.show({
+        text: "Login Successful",
+        buttonText: ""
+      });
+      let {
+        screenProps: { setJwt, setUserType },
+        navigation
+      } = this.props;
 
-    AsyncStorage.multiSet(
-      [["@jwt", "add_jwt_here"], ["@userType", "lecturer"]],
-      error => {
-        if (!error) {
-          setJwt("add_jwt_here");
-          setUserType("lecturer");
+      AsyncStorage.multiSet(
+        [
+          ["@jwt", response.data.jwt],
+          ["@userType", "lecturer"],
+          ["currentUser", JSON.stringify(response.data.user)]
+        ],
+        error => {
+          if (!error) {
+            setJwt(response.data.jwt);
+            setUserType("lecturer");
 
-          navigation.dispatch(
-            NavigationActions.reset({
-              index: 0,
-              key: null,
-              actions: [
-                NavigationActions.navigate({
-                  routeName: "dashboard"
-                })
-              ]
-            })
-          );
+            navigation.dispatch(
+              NavigationActions.reset({
+                index: 0,
+                key: null,
+                actions: [
+                  NavigationActions.navigate({
+                    routeName: "dashboard"
+                  })
+                ]
+              })
+            );
+          }
         }
-      }
-    );
+      );
+    } else {
+      Toast.show({
+        text: "Login Failed, Please check details and try again later",
+        buttonText: ""
+      });
+    }
   };
 
   updateFields = (value, field) => {
     let { userAuthDetails } = this.state;
     let isLoginActive = AuthUtils.loginValidation(
-      userAuthDetails.username,
+      userAuthDetails.email,
       userAuthDetails.password
     );
     userAuthDetails[field] = value;
@@ -72,12 +90,15 @@ class LecturerLogin extends React.PureComponent {
         <LayoutContainer style={styles.layoutContainer}>
           <Content>
             <Form
-              onUpdateUsername={val => this.updateFields(val, "username")}
+              onUpdateUsername={val => this.updateFields(val, "email")}
               onUpdatePassword={val => this.updateFields(val, "password")}
               hideFullNameField
             />
           </Content>
-          <Footer onLogin={this.login} loginActive={this.state.isLoginActive} />
+          <Footer
+            onLogin={() => this.login()}
+            loginActive={this.state.isLoginActive}
+          />
         </LayoutContainer>
       </Container>
     );
