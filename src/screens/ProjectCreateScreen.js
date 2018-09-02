@@ -1,13 +1,5 @@
 import React from "react";
-import {
-  View,
-  LayoutAnimation,
-  UIManager,
-  Platform,
-  AsyncStorage,
-
-} from "react-native";
-import PropTypes from "prop-types";
+import { View, AsyncStorage } from "react-native";
 import { Container, Content, Toast } from "native-base";
 import { connect } from "react-redux";
 import { NavigationActions } from "react-navigation";
@@ -16,9 +8,9 @@ import Colors from "../assets/Colors";
 import LayoutContainer from "../containers/LayoutContainer";
 import AppHeader from "../components/AppHeader";
 import AppTextInput from "../components/AppTextInput";
-import Icon from "../components/Icon";
 import AppFab from "../components/AppFab";
 import ReduxContext from "../context/ReduxContext";
+import { createProject } from "../api/assessment";
 
 class ProjectCreateScreen extends React.PureComponent {
   state = {
@@ -26,37 +18,32 @@ class ProjectCreateScreen extends React.PureComponent {
     projectDescription: ""
   };
 
-  saveProject = () => {
-    //@Todo: Send the project data to the server
+  saveProject = async () => {
+    let { navigation } = this.props;
+    const { projectName, projectDescription } = this.state;
 
-    let { projects, screenProps, navigation } = this.props,
-      { projectName, projectDescription } = this.state,
-      _newProjects = [
-        ...projects,
-        { name: projectName, description: projectDescription, groups: [] }
-      ];
+    const response = await createProject({
+      title: projectName,
+      description: projectDescription
+    });
+    if (response.data) {
+      Toast.show({
+        text: `Project ${projectName} added`,
+        buttonText: "okay"
+      });
 
-    AsyncStorage.setItem("@projects", JSON.stringify(_newProjects)).then(
-      result => {
-        screenProps.setProjects(_newProjects);
-        Toast.show({
-          text: `Project ${projectName} added`,
-          buttonText: "okay"
-        });
-
-        navigation.dispatch(
-          NavigationActions.reset({
-            index: 0,
-            key: null,
-            actions: [
-              NavigationActions.navigate({
-                routeName: "dashboard"
-              })
-            ]
-          })
-        );
-      }
-    );
+      navigation.dispatch(
+        NavigationActions.reset({
+          index: 0,
+          key: null,
+          actions: [
+            NavigationActions.navigate({
+              routeName: "dashboard"
+            })
+          ]
+        })
+      );
+    }
   };
 
   render() {
@@ -89,7 +76,11 @@ class ProjectCreateScreen extends React.PureComponent {
               />
             </Content>
           </LayoutContainer>
-          <AppFab name="done" type="MaterialIcons" onPress={this.saveProject} />
+          <AppFab
+            name="done"
+            type="MaterialIcons"
+            onPress={() => this.saveProject()}
+          />
         </Container>
       </View>
     );

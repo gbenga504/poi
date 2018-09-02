@@ -1,11 +1,12 @@
 import { httpGet, httpPost, httpPut, httpDelete } from "./axios";
 import { AsyncStorage } from "react-native";
 
-export const createProject = async ({ title }) => {
+export const createProject = async ({ title, description }) => {
   const user = JSON.parse(await AsyncStorage.getItem("currentUser"));
   return httpPost("projects", {
     projects: {
       title,
+      description,
       lecturer_id: user.id
     }
   });
