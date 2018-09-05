@@ -1,7 +1,7 @@
 import React from "react";
 import { Content, Container } from "native-base";
 import { connect } from "react-redux";
-import { View, AsyncStorage } from "react-native";
+import { AsyncStorage } from "react-native";
 
 import LayoutContainer from "../../containers/LayoutContainer";
 import AppHeader from "../../components/AppHeader";

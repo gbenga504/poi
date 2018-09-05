@@ -31,11 +31,18 @@ export const lecturerProjects = async () => {
 //   });
 // };
 
-export const createGroup = async ({ title, projectId }) => {
-  return httpPut(`groups`, {
+export const createGroup = async ({
+  title,
+  description,
+  projectId,
+  students
+}) => {
+  return httpPost(`groups`, {
     groups: {
       title,
-      project_id: projectId
+      description,
+      project_id: projectId,
+      students_ids: students
     }
   });
 };
@@ -46,4 +53,12 @@ export const deleteGroup = async id => {
 
 export const projectGroups = async projectId => {
   return httpGet(`groups/project_groups/${projectId}`);
+};
+
+export const projectEligbleUsers = async projectId => {
+  return httpGet(`project_eligible_users/${projectId}`);
+};
+
+export const groupLocations = async groupId => {
+  return httpGet(`locations/group_locations/${groupId}`);
 };

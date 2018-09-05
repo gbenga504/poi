@@ -19,29 +19,24 @@ class AppHeader extends Component {
     pageTitle: PropTypes.string
   };
 
-  logout = () => {
+  logout = async () => {
     let {
       screenProps: { setJwt, setUserType }
     } = this.props;
-
-    AsyncStorage.multiRemove(["@userType", "@jwt"])
-      .then(data => {
-        setJwt(null);
-        setUserType(null);
-
-        this.props.navigation.dispatch(
-          NavigationActions.reset({
-            index: 0,
-            key: null,
-            actions: [
-              NavigationActions.navigate({
-                routeName: "selectAccount"
-              })
-            ]
+    await AsyncStorage.removeItem("@userType");
+    await AsyncStorage.removeItem("@jwt");
+    await AsyncStorage.removeItem("currentUser");
+    this.props.navigation.dispatch(
+      NavigationActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+          NavigationActions.navigate({
+            routeName: "selectAccount"
           })
-        );
+        ]
       })
-      .catch(err => alert(err));
+    );
   };
 
   render() {
@@ -77,7 +72,7 @@ class AppHeader extends Component {
                 </Button>
               }
             >
-              <MenuItem onPress={this.logout}>Logout</MenuItem>
+              <MenuItem onPress={() => this.logout}>Logout</MenuItem>
             </Menu>
           )}
         </Right>

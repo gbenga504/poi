@@ -6,6 +6,7 @@ const httpClient = async () => {
 
   return axios.create({
     baseURL: "http://localhost:4000/api/v1/",
+    // baseURL: "http://4fa53e64.ngrok.io/api/v1/",
     timeout: 1000,
     headers: {
       Authorization: `Bearer ${authToken}`,
