@@ -4,14 +4,18 @@ export const registerUser = async ({
   email,
   password,
   passwordConfirmation,
-  userType
+  userType,
+  matricNumber = "",
+  name = ""
 }) => {
   return httpPost("sign_up", {
     user: {
       email,
       password,
       passsword_confirmation: passwordConfirmation,
-      user_type: userType
+      user_type: userType,
+      matric_number: matricNumber,
+      name
     }
   });
 };

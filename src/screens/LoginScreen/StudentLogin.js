@@ -1,7 +1,6 @@
 import React from "react";
 import { View, AsyncStorage } from "react-native";
 import { Container, Content, Toast } from "native-base";
-import PropTypes from "prop-types";
 import { NavigationActions } from "react-navigation";
 
 import LayoutContainer from "../../containers/LayoutContainer";
@@ -10,14 +9,13 @@ import Form from "../../components/Login/Form";
 import Footer from "../../components/Login/Footer";
 import Colors from "../../assets/Colors";
 import { AuthUtils } from "../../utils";
-import { MediumText } from "../../components/AppText";
 import ReduxContext from "../../context/ReduxContext";
-import _ from "lodash";
+import { loginUser } from "../../api/accounts";
 
 class StudentLogin extends React.PureComponent {
   state = {
     userAuthDetails: {
-      matricNumber: "",
+      email: "",
       password: ""
     },
     isLoading: false,
@@ -25,61 +23,62 @@ class StudentLogin extends React.PureComponent {
   };
 
   login = async () => {
-    let {
-      screenProps: { setJwt, setUserType },
-      navigation
-    } = this.props;
-    const students = await AsyncStorage.getItem("@students");
-    if (students) {
-      let parsedStudents = JSON.parse(students);
-      const student = _.find(parsedStudents, {
-        matricNumber: this.state.userAuthDetails.matricNumber,
-        password: this.state.userAuthDetails.password
-      });
-      console.log("student", student);
-      if (student) {
-        AsyncStorage.multiSet(
-          [["@jwt", student.matricNumber], ["@userType", "student"]],
-          error => {
-            if (!error) {
-              setJwt(student.matricNumber);
-              setUserType("student");
-
-              navigation.dispatch(
-                NavigationActions.reset({
-                  index: 0,
-                  key: null,
-                  actions: [
-                    NavigationActions.navigate({
-                      routeName: "dashboard"
-                    })
-                  ]
-                })
-              );
-            }
-          }
-        );
-      } else {
-        // ask to register
-        Toast.show({
-          text: "User credentials invalid, Please Register"
-        });
-        this.props.navigation.navigate("registerScreen");
-      }
-    } else {
-      // ask to register
+    const response = await loginUser({
+      email: this.state.userAuthDetails.email,
+      password: this.state.userAuthDetails.password
+    });
+    if (response.data) {
       Toast.show({
-        text: "User credentials invalid, Please Register"
+        text: "Login Successful",
+        buttonText: ""
       });
-      this.props.navigation.navigate("registerScreen");
+      let {
+        screenProps: { setJwt, setUserType },
+        navigation
+      } = this.props;
+
+      AsyncStorage.multiSet(
+        [
+          ["@jwt", response.data.jwt],
+          ["@userType", "student"],
+          ["currentUser", JSON.stringify(response.data.user)]
+        ],
+        error => {
+          if (!error) {
+            setJwt(response.data.jwt);
+            setUserType("student");
+
+            navigation.dispatch(
+              NavigationActions.reset({
+                index: 0,
+                key: null,
+                actions: [
+                  NavigationActions.navigate({
+                    routeName: "dashboard"
+                  })
+                ]
+              })
+            );
+          }
+        }
+      );
+    } else {
+      Toast.show({
+        text: "Login Failed, Please check details and try again later",
+        buttonText: ""
+      });
     }
   };
 
   updateFields = (value, field) => {
     let { userAuthDetails } = this.state;
+    let isLoginActive = AuthUtils.loginValidation(
+      userAuthDetails.email,
+      userAuthDetails.password
+    );
     userAuthDetails[field] = value;
     this.setState({
-      isLoginActive: true,
+      isLoginActive: isLoginActive,
       userAuthDetails: userAuthDetails
     });
   };
@@ -91,19 +90,15 @@ class StudentLogin extends React.PureComponent {
         <LayoutContainer style={styles.layoutContainer}>
           <Content>
             <Form
-              userNamePlaceholder="MATRIC NUMBER"
-              onUpdateUsername={val => this.updateFields(val, "matricNumber")}
+              onUpdateUsername={val => this.updateFields(val, "email")}
               onUpdatePassword={val => this.updateFields(val, "password")}
+              hideFullNameField
             />
-            <MediumText style={styles.text}>Or</MediumText>
-            <MediumText
-              style={{ ...styles.text, ...styles.register }}
-              onPress={() => this.props.navigation.navigate("registerScreen")}
-            >
-              Not Registered ? Sign Up as a Student
-            </MediumText>
           </Content>
-          <Footer onLogin={this.login} loginActive={this.state.isLoginActive} />
+          <Footer
+            onLogin={() => this.login()}
+            loginActive={true}
+          />
         </LayoutContainer>
       </Container>
     );
@@ -112,7 +107,9 @@ class StudentLogin extends React.PureComponent {
 
 const _StudentLogin = props => (
   <ReduxContext.Consumer>
-    {({ screenProps }) => <StudentLogin {...props} screenProps={screenProps} />}
+    {({ screenProps }) => (
+      <StudentLogin {...props} screenProps={screenProps} />
+    )}
   </ReduxContext.Consumer>
 );
 

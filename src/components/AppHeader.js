@@ -20,9 +20,6 @@ class AppHeader extends Component {
   };
 
   logout = async () => {
-    let {
-      screenProps: { setJwt, setUserType }
-    } = this.props;
     await AsyncStorage.removeItem("@userType");
     await AsyncStorage.removeItem("@jwt");
     await AsyncStorage.removeItem("currentUser");
@@ -72,7 +69,7 @@ class AppHeader extends Component {
                 </Button>
               }
             >
-              <MenuItem onPress={() => this.logout}>Logout</MenuItem>
+              <MenuItem onPress={() => this.logout()}>Logout</MenuItem>
             </Menu>
           )}
         </Right>
