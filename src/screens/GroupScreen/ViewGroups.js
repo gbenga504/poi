@@ -8,7 +8,7 @@ import AppHeader from "../../components/AppHeader";
 import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
 import _ from "lodash";
-import { projectGroups } from "../../api/assessment";
+import { projectGroups, studentProjectGroups } from "../../api/assessment";
 
 class ViewGroups extends React.PureComponent {
   state = {
@@ -28,14 +28,16 @@ class ViewGroups extends React.PureComponent {
         }
       }
     } = this.props;
-    if (userType == "lecturer") {
-      const response = await projectGroups(id);
-      if (response.data) {
-        groups = response.data.data.map(group => ({
-          name: group.title,
-          ...group
-        }));
-      }
+    let response =
+      userType == "lecturer"
+        ? await projectGroups(id)
+        : await studentProjectGroups(id);
+
+    if (response.data) {
+      groups = response.data.data.map(group => ({
+        name: group.title,
+        ...group
+      }));
     }
     this.setState({
       userType,

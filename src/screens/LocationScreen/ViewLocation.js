@@ -8,6 +8,7 @@ import AppHeader from "../../components/AppHeader";
 import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
 import _ from "lodash";
+import { groupLocations } from "../../api/assessment";
 
 class ViewLocation extends React.PureComponent {
   state = {
@@ -20,10 +21,7 @@ class ViewLocation extends React.PureComponent {
       return [{ name: "Delete", onPress: () => alert("deleted") }];
     }
   };
-  componentDidMount() {
-    this.groupLocations();
-  }
-  groupLocations = async () => {
+  async componentDidMount() {
     let {
       navigation: {
         state: {
@@ -31,26 +29,18 @@ class ViewLocation extends React.PureComponent {
         }
       }
     } = this.props;
-    let locations = await AsyncStorage.getItem("@locations");
-
-    if (locations) {
-      let grouplocations = _.filter(JSON.parse(locations), {
-        groupName: group.name
+    const response = await groupLocations(group.id);
+    if (response.data) {
+      const { data } = response.data;
+      this.setState({
+        locations: data.map(location => ({
+          ...location,
+          name: `${location.elevation} - ${location.long} ${location.lat}`
+        }))
       });
-      console.log("grouplocations", grouplocations);
-      if (grouplocations) {
-        grouplocations = grouplocations.map(location => {
-          return {
-            ...location,
-            name: location.locationNumber,
-            description: `${group.students.length} students`,
-            group
-          };
-        });
-      }
-      this.setState({ locations: grouplocations || [] });
     }
-  };
+  }
+
   render() {
     let {
       navigation: {

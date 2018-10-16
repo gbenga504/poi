@@ -9,7 +9,7 @@ import AppFab from "../components/AppFab";
 import InteractiveList from "../components/InteractiveList";
 import ReduxContext from "../context/ReduxContext";
 import _ from "lodash";
-import { lecturerProjects } from "../api/assessment";
+import { lecturerProjects, studentProjects } from "../api/assessment";
 
 class DashboardScreen extends React.PureComponent {
   state = {
@@ -32,21 +32,12 @@ class DashboardScreen extends React.PureComponent {
   }
 
   getStudentProjects = async () => {
-    let groups = await AsyncStorage.getItem("@groups");
-    const studentMatric = await AsyncStorage.getItem("@jwt");
-    if (groups) {
-      const parsedGroups = _.filter(JSON.parse(groups), grp => {
-        return _.find(grp.students, { matric_no: studentMatric });
+    const response = await studentProjects()
+    if (response.data) {
+      const { data } = response.data;
+      this.setState({
+        projects: data.map(project => ({ name: project.title, ...project }))
       });
-      if (parsedGroups) {
-        let projects = parsedGroups.map(group => ({
-          name: group.projectName
-        }));
-        console.log("projects", projects);
-        this.setState({
-          projects: projects
-        });
-      }
     }
   };
 

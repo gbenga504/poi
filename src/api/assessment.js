@@ -21,6 +21,16 @@ export const lecturerProjects = async () => {
   return httpGet(`projects/lecturer_projects/${user.id}`);
 };
 
+export const studentProjects = async () => {
+  const user = JSON.parse(await AsyncStorage.getItem("currentUser"));
+  return httpGet(`projects/user_projects/${user.id}`);
+};
+
+export const studentProjectGroups = async projectId => {
+  const user = JSON.parse(await AsyncStorage.getItem("currentUser"));
+  return httpGet(`groups/user_project_groups/${user.id}/${projectId}`);
+};
+
 // export const updateProject = async ({ title, projectId }) => {
 //   const user = await AsyncStorage.getItem("currentUser");
 //   return httpPut(`projects/${projectId}`, {
