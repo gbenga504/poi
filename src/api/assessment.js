@@ -72,3 +72,16 @@ export const projectEligbleUsers = async projectId => {
 export const groupLocations = async groupId => {
   return httpGet(`locations/group_locations/${groupId}`);
 };
+
+export const createLocation = async params => {
+  return httpPost(`locations`, {
+    locations: params
+  });
+};
+
+export const updateLocation = async params => {
+  const { id } = params
+  return httpPut(`locations/${id}`, {
+    locations: params
+  });
+};

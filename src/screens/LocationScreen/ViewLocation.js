@@ -47,7 +47,7 @@ class ViewLocation extends React.PureComponent {
         navigate,
         state: {
           params: {
-            group: { name }
+            group: { name, id }
           }
         }
       }
@@ -61,7 +61,13 @@ class ViewLocation extends React.PureComponent {
             <InteractiveList
               dataArray={this.state.locations}
               items={this.state.locations}
-              onPress={location => navigate("addLocation", { location })}
+              onPress={location =>
+                navigate("addLocation", {
+                  location: location,
+                  groupName: name,
+                  groupId: id
+                })
+              }
               renderNullItem="No Location Added Yet"
               actionButtons={list => this.generateActionButtons(list)}
             />
@@ -73,7 +79,8 @@ class ViewLocation extends React.PureComponent {
             type="MaterialIcons"
             onPress={() =>
               this.props.navigation.navigate("addLocation", {
-                location: { groupName: name }
+                groupName: name,
+                groupId: id
               })
             }
           />

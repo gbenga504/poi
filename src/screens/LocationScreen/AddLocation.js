@@ -7,55 +7,49 @@ import _ from "lodash";
 import LayoutContainer from "../../containers/LayoutContainer";
 import AppHeader from "../../components/AppHeader";
 import { MediumText } from "../../components/AppText";
+import { createLocation, updateLocation } from "../../api/assessment";
 
 class AddLocation extends React.PureComponent {
   save = async () => {
-    console.log("location state", this.state);
-    //@Todo, save the data and route to the Location screen
-    let { userType } = this.props;
-    // const filledAllFields = Object.values(yourTestObject).every(item => item)
-    if (userType == "student") {
-      const formData = {
-        ...this.state
-      };
-      console.log("form data", formData);
-      const locations = await AsyncStorage.getItem("@locations");
-      let parsedLocations = [];
-      if (locations) {
-        parsedLocations = JSON.parse(locations);
-        this.updateLocation(formData, parsedLocations);
-      } else {
-        // no location previously added
-        this.addNewLocation([...parsedLocations, formData]);
+    // create location
+    if (!this.state.id) {
+      const response = await createLocation(this.state);
+      if (response.data) {
+        Toast.show({
+          text: "Location added successfully",
+          buttonText: ""
+        });
+        this.handleSuccess();
       }
-      this.props.navigation.goBack();
+    } else {
+      // update location
+      console.log("update called");
+      const response = await updateLocation(this.state);
+      if (response.data) {
+        Toast.show({
+          text: "Location updated successfully",
+          buttonText: ""
+        });
+        this.handleSuccess();
+      }
     }
   };
 
-  updateLocation = (formData, parsedLocations) => {
-    const index = parsedLocations.findIndex(
-      location => location.locationNumber == formData.locationNumber
-    );
-    if (index) {
-      console.log("index", index);
-      const locationsBeforeIndex = parsedLocations.slice(0, index);
-      const locationsAfterIndex = parsedLocations.slice(
-        index + 1,
-        parsedLocations.length
-      );
-
-      console.log("locationsBeforeIndex", locationsBeforeIndex);
-      console.log("locationsAfterIndex", locationsAfterIndex);
-      const locationsToSave = [
-        ...locationsBeforeIndex,
-        formData,
-        ...locationsAfterIndex
-      ];
-      console.log("locationsToSave", locationsToSave);
-      this.addNewLocation(locationsToSave);
-    } else {
-      this.addNewLocation([...parsedLocations, formData]);
-    }
+  handleSuccess = () => {
+    let {
+      navigation: {
+        navigate,
+        state: {
+          params: { groupId, groupName }
+        }
+      }
+    } = this.props;
+    navigate("viewLocation", {
+      group: {
+        id: groupId,
+        name: groupName
+      }
+    });
   };
 
   addNewLocation = async parsedLocations => {
@@ -66,32 +60,32 @@ class AddLocation extends React.PureComponent {
     });
   };
   state = {
-    locationNumber: "",
-    latitude: "",
-    longtitude: "",
+    location_number: "",
+    lat: "",
+    long: "",
     elevation: "",
-    featureType: "",
+    feature_type: "",
     address: "",
-    rockType: "",
+    rock_type: "",
     mineralogy: "",
     strike: "",
     dip: "",
-    structTrend: "",
+    structural_trend: "",
     description: "",
     locationId: "",
-    groupName: ""
+    groupName: "",
+    id: null
   };
 
   componentDidMount() {
     let {
       navigation: {
-        navigate,
         state: {
-          params: { location }
+          params: { groupId, location }
         }
       }
     } = this.props;
-    this.setState({ ...location });
+    this.setState({ ...location, group_id: groupId });
   }
   render() {
     let { userType } = this.props;
@@ -113,24 +107,24 @@ class AddLocation extends React.PureComponent {
               <Input
                 editable={userType == "lecturer" ? false : true}
                 placeholder="Enter a location Number"
-                onChangeText={val => this.setState({ locationNumber: val })}
-                value={this.state.locationNumber}
+                onChangeText={val => this.setState({ location_number: val })}
+                value={this.state.location_number}
               />
             </Item>
             <Item>
               <Input
                 editable={userType == "lecturer" ? false : true}
                 placeholder="Enter Latitude"
-                onChangeText={val => this.setState({ latitude: val })}
-                value={this.state.latitude}
+                onChangeText={val => this.setState({ lat: val })}
+                value={this.state.lat}
               />
             </Item>
             <Item>
               <Input
                 editable={userType == "lecturer" ? false : true}
                 placeholder="Enter Longitude"
-                onChangeText={val => this.setState({ longtitude: val })}
-                value={this.state.longtitude}
+                onChangeText={val => this.setState({ long: val })}
+                value={this.state.long}
               />
             </Item>
             <Item>
@@ -153,16 +147,16 @@ class AddLocation extends React.PureComponent {
               <Input
                 editable={userType == "lecturer" ? false : true}
                 placeholder="Enter Feature Type"
-                onChangeText={val => this.setState({ featureType: val })}
-                value={this.state.featureType}
+                onChangeText={val => this.setState({ feature_type: val })}
+                value={this.state.feature_type}
               />
             </Item>
             <Item>
               <Input
                 editable={userType == "lecturer" ? false : true}
                 placeholder="Enter a Rock Type"
-                onChangeText={val => this.setState({ rockType: val })}
-                value={this.state.rockType}
+                onChangeText={val => this.setState({ rock_type: val })}
+                value={this.state.rock_type}
               />
             </Item>
             <Item>
@@ -193,8 +187,8 @@ class AddLocation extends React.PureComponent {
               <Input
                 editable={userType == "lecturer" ? false : true}
                 placeholder="Enter Structural Trend"
-                onChangeText={val => this.setState({ structTrend: val })}
-                value={this.state.structTrend}
+                onChangeText={val => this.setState({ structural_trend: val })}
+                value={this.state.structural_trend}
               />
             </Item>
             <Item>
