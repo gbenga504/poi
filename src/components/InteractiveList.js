@@ -21,7 +21,7 @@ const InteractiveList = props => {
             <Grid style={styles.listContainer}>
               <Col style={styles.listAvatar}>
                 <BoldText style={styles.listAvatarText}>
-                  {list.name.toUpperCase().charAt(0)}
+                  {i}
                 </BoldText>
               </Col>
               <Col>
