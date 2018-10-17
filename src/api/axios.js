@@ -5,7 +5,7 @@ const httpClient = async () => {
   const authToken = await AsyncStorage.getItem("@jwt");
 
   return axios.create({
-    baseURL: "http://localhost:4000/api/v1/",
+    baseURL: "https://poiphoenix.herokuapp.com/api/v1/",
     // baseURL: "http://4fa53e64.ngrok.io/api/v1/",
     timeout: 1000,
     headers: {
