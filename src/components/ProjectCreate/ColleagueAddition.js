@@ -2,13 +2,12 @@ import React from "react";
 import PropTypes from "prop-types";
 import {
   View,
-  CheckBox,
   Modal,
   StyleSheet,
   AsyncStorage,
   TouchableWithoutFeedback
 } from "react-native";
-import { Content } from "native-base";
+import { Content, CheckBox } from "native-base";
 
 import { BoldText, MediumText } from "../AppText";
 import AppHeader from "../AppHeader";
@@ -16,6 +15,7 @@ import Icon from "../Icon";
 import Fonts from "../../assets/Fonts";
 import Button from "../Button";
 import AppFab from "../AppFab";
+import { projectEligbleUsers } from "../../api/assessment";
 
 export default class ColleagueAddition extends React.PureComponent {
   state = {
@@ -29,20 +29,22 @@ export default class ColleagueAddition extends React.PureComponent {
     onAddColleague: PropTypes.func.isRequired
   };
 
-  componentDidMount() {
-    this.fetchSchoolStudents();
-  }
-  fetchSchoolStudents = async () => {
-    const students = await AsyncStorage.getItem("@students");
+  async componentDidMount() {
+    let { projectId } = this.props;
+    const {
+      data: { data: students }
+    } = await projectEligbleUsers(projectId);
+
     if (students) {
       this.setState({
-        students: JSON.parse(students).map(std => ({
+        students: students.map(std => ({
           name: std.name,
-          matric_no: std.matricNumber
+          matric_no: std.matric_number,
+          id: std.id
         }))
       });
     }
-  };
+  }
 
   setStudent = student => {
     if (this.state.addedStudent[student.matric_no]) {
@@ -107,12 +109,15 @@ export default class ColleagueAddition extends React.PureComponent {
                 >
                   <View style={styles.section} key={i}>
                     <CheckBox
-                      value={
+                      checked={
                         this.state.addedStudent[student.matric_no]
                           ? true
                           : false
                       }
-                      onValueChange={() => this.setStudent(student)}
+                      style={{
+                        marginRight: 20
+                      }}
+                      onPress={() => this.setStudent(student)}
                     />
                     <View styles={styles.nameContainer}>
                       <BoldText style={{ ...styles.text, ...styles.name }}>

@@ -1,12 +1,15 @@
 import React from "react";
+import { AsyncStorage } from "react-native";
 import { NavigationActions } from "react-navigation";
 import { connect } from "react-redux";
 
 class InceptionScreen extends React.PureComponent {
-  componentDidMount() {
-    let { navigation, userType } = this.props;
+  async componentDidMount() {
+    const { navigation } = this.props;
+    const currentUser = await AsyncStorage.getItem("currentUser");
+    const jwt = await AsyncStorage.getItem("@jwt");
 
-    if (!userType) {
+    if (!currentUser && !jwt) {
       navigation.dispatch(
         NavigationActions.reset({
           index: 0,

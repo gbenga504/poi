@@ -13,15 +13,15 @@ import Icon from "../../components/Icon";
 import ColleagueAddition from "../../components/ProjectCreate/ColleagueAddition";
 import ReduxContext from "../../context/ReduxContext";
 import AppFab from "../../components/AppFab";
+import { createGroup } from "../../api/assessment";
 
 class CreateGroup extends React.PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
-      groupName: "",
-      groupDescription: "",
-      groupId: Date.now().toString(),
+      title: "",
+      description: "",
       groupNumberAdded: "0 persons Added",
       isColleageAddtionVisible: false,
       students: []
@@ -44,45 +44,24 @@ class CreateGroup extends React.PureComponent {
     });
   };
 
-  saveStudents = () => {
-    //@Todo send to database
+  saveStudents = async () => {
+    const { title, description, students } = this.state;
     let {
-        projects,
-        groups,
-        screenProps: { setProjects, setGroups },
-        navigation: {
-          state: {
-            params: { projectName }
-          }
-        },
-        navigation
-      } = this.props,
-      { groupId, groupName, groupDescription, students } = this.state;
-
-    let _projects = projects.map(project => {
-      if (project.name == projectName) {
-        return { ...project, groups: [...project.groups, this.state.groupId] };
-      }
-      return project;
+      navigation: {
+        state: {
+          params: { projectId, project }
+        }
+      },
+      navigation
+    } = this.props;
+    const response = await createGroup({
+      title,
+      description,
+      projectId,
+      students: students.map(student => student.id)
     });
 
-    let _groups = [
-      ...groups,
-      {
-        id: groupId,
-        name: groupName,
-        description: groupDescription,
-        students,
-        projectName
-      }
-    ];
-
-    AsyncStorage.multiSet([
-      ["@projects", JSON.stringify(_projects)],
-      ["@groups", JSON.stringify(_groups)]
-    ]).then(result => {
-      setGroups(_groups);
-      setProjects(_projects);
+    if (response.data) {
       Toast.show({
         text: `Group Created Successfully`,
         buttonText: "Okay"
@@ -95,25 +74,28 @@ class CreateGroup extends React.PureComponent {
           actions: [
             NavigationActions.navigate({
               routeName: "viewGroups",
-              params: { project: { name: projectName } }
-            }),
-            NavigationActions.navigate({
-              routeName: "dashboard"
+              params: { project }
             })
           ]
         })
       );
-    });
+    }
   };
 
   render() {
     let {
       isColleageAddtionVisible,
-      groupName,
+      title,
       groupNumberAdded,
-      groupDescription
+      description
     } = this.state;
-
+    let {
+      navigation: {
+        state: {
+          params: { projectId }
+        }
+      }
+    } = this.props;
     return (
       <View style={styles.container}>
         <Container>
@@ -127,19 +109,17 @@ class CreateGroup extends React.PureComponent {
             <Content>
               <AppTextInput
                 style={styles.textInput}
-                value={groupName}
+                value={title}
                 placeholder="Enter a Group Name"
                 placeholderTextColor={Colors.listContentColor}
-                onChangeText={groupName => this.setState({ groupName })}
+                onChangeText={title => this.setState({ title })}
               />
               <AppTextInput
                 style={styles.textInput}
-                value={groupDescription}
+                value={description}
                 placeholder="Enter the Group Description"
                 placeholderTextColor={Colors.listContentColor}
-                onChangeText={groupDescription =>
-                  this.setState({ groupDescription })
-                }
+                onChangeText={description => this.setState({ description })}
               />
               <View style={styles.addColleaguesContainer}>
                 <AppTextInput
@@ -162,13 +142,14 @@ class CreateGroup extends React.PureComponent {
           <AppFab
             name="done-all"
             type="MaterialIcons"
-            onPress={this.saveStudents}
+            onPress={() => this.saveStudents()}
           />
         </Container>
         <ColleagueAddition
           isVisible={isColleageAddtionVisible}
           onRequestClose={this.toggleColleagueAddtion}
           onAddColleague={students => this.setStudents(students)}
+          projectId={projectId}
         />
       </View>
     );

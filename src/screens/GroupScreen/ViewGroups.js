@@ -8,34 +8,45 @@ import AppHeader from "../../components/AppHeader";
 import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
 import _ from "lodash";
-
-const GROUPS = [
-  {
-    name: "GROUP 1",
-    description: "Futa sampling group"
-  }
-];
+import { projectGroups, studentProjectGroups } from "../../api/assessment";
 
 class ViewGroups extends React.PureComponent {
   state = {
-    groups: []
+    groups: [],
+    userType: ""
   };
 
-  componentDidMount() {
+  async componentDidMount() {
+    const userType = await AsyncStorage.getItem("@userType");
+    let groups = [];
     let {
       navigation: {
         state: {
           params: {
-            project: { name }
+            project: { name, id }
           }
         }
       }
     } = this.props;
-    this.projectGroups(name);
+    let response =
+      userType == "lecturer"
+        ? await projectGroups(id)
+        : await studentProjectGroups(id);
+
+    if (response.data) {
+      groups = response.data.data.map(group => ({
+        name: group.title,
+        ...group
+      }));
+    }
+    this.setState({
+      userType,
+      groups
+    });
   }
 
   generateActionButtons = group => {
-    let { userType } = this.props;
+    let { userType } = this.state;
     if (userType == "lecturer") {
       return [
         { name: "Properties", onPress: () => alert("properties") },
@@ -54,37 +65,17 @@ class ViewGroups extends React.PureComponent {
     }
   };
 
-  projectGroups = async projectName => {
-    let { userType } = this.props;
-    let groups = await AsyncStorage.getItem("@groups");
-    if (userType == "lecturer" && groups) {
-      let projectGroups = _.filter(JSON.parse(groups), {
-        projectName: projectName
-      });
-      this.setState({ groups: projectGroups || [] });
-    } else if (userType == "student" && groups) {
-      const studentMatric = await AsyncStorage.getItem("@jwt");
-      let projectGroups = _.filter(JSON.parse(groups), {
-        projectName: projectName
-      });
-      const studentGroups = _.filter(projectGroups, grp => {
-        return _.find(grp.students, { matric_no: studentMatric });
-      });
-      this.setState({ groups: studentGroups });
-    }
-  };
-
   render() {
     let {
       navigation: {
         navigate,
         state: {
           params: {
-            project: { name }
+            project: { name, id },
+            project
           }
         }
-      },
-      groups
+      }
     } = this.props;
 
     return (
@@ -104,7 +95,9 @@ class ViewGroups extends React.PureComponent {
             <AppFab
               onPress={() =>
                 this.props.navigation.navigate("createGroup", {
-                  projectName: name
+                  projectName: name,
+                  projectId: id,
+                  project
                 })
               }
             />

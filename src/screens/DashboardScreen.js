@@ -9,42 +9,35 @@ import AppFab from "../components/AppFab";
 import InteractiveList from "../components/InteractiveList";
 import ReduxContext from "../context/ReduxContext";
 import _ from "lodash";
-
-const PROJECTS = [{ name: "RSG 201", description: "5 Groups" }];
+import { lecturerProjects, studentProjects } from "../api/assessment";
 
 class DashboardScreen extends React.PureComponent {
   state = {
     projects: []
   };
 
-  componentDidMount() {
-    this.getStudentProjects();
-  }
-  formatProject = () => {
-    let { userType, projects } = this.props;
+  async componentDidMount() {
+    const userType = await AsyncStorage.getItem("@userType");
     if (userType == "lecturer") {
-      return projects;
-    } else {
-      return this.state.projects;
-    }
-  };
-
-  getStudentProjects = async () => {
-    let groups = await AsyncStorage.getItem("@groups");
-    const studentMatric = await AsyncStorage.getItem("@jwt");
-    if (groups) {
-      const parsedGroups = _.filter(JSON.parse(groups), grp => {
-        return _.find(grp.students, { matric_no: studentMatric });
-      });
-      if (parsedGroups) {
-        let projects = parsedGroups.map(group => ({
-          name: group.projectName
-        }));
-        console.log("projects", projects);
+      const response = await lecturerProjects();
+      if (response.data) {
+        const { data } = response.data;
         this.setState({
-          projects: projects
+          projects: data.map(project => ({ name: project.title, ...project }))
         });
       }
+    } else {
+      await this.getStudentProjects();
+    }
+  }
+
+  getStudentProjects = async () => {
+    const response = await studentProjects()
+    if (response.data) {
+      const { data } = response.data;
+      this.setState({
+        projects: data.map(project => ({ name: project.title, ...project }))
+      });
     }
   };
 
@@ -84,8 +77,8 @@ class DashboardScreen extends React.PureComponent {
           <AppHeader navigation={this.props.navigation} pageTitle="Dashboard" />
           <LayoutContainer style={styles.bodyContainer}>
             <InteractiveList
-              dataArray={this.formatProject()}
-              items={this.formatProject()}
+              dataArray={this.state.projects}
+              items={this.state.projects}
               onPress={project => navigate("viewGroups", { project })}
               renderNullItem="No Projects Added Yet"
               actionButtons={
