@@ -27,7 +27,9 @@ const InteractiveList = props => {
               <Col>
                 <BoldText style={styles.listText}>{list.name}</BoldText>
                 <RegularText style={styles.listDescription}>
-                  {list.description}
+                  {list.description
+                    ? `${list.description.substring(0, 15)}...`
+                    : ""}
                 </RegularText>
               </Col>
               {list.tag && (
