@@ -11,6 +11,7 @@ import Colors from "../../assets/Colors";
 import { AuthUtils } from "../../utils";
 import ReduxContext from "../../context/ReduxContext";
 import { loginUser } from "../../api/accounts";
+import LoadingView from "../../components/LoadingView";
 
 class StudentLogin extends React.PureComponent {
   state = {
@@ -23,48 +24,65 @@ class StudentLogin extends React.PureComponent {
   };
 
   login = async () => {
-    const response = await loginUser({
-      email: this.state.userAuthDetails.email,
-      password: this.state.userAuthDetails.password
+    this.setState({
+      isLoading: true
     });
-    if (response.data) {
-      Toast.show({
-        text: "Login Successful",
-        buttonText: ""
+
+    try {
+      const response = await loginUser({
+        email: this.state.userAuthDetails.email,
+        password: this.state.userAuthDetails.password
       });
-      let {
-        screenProps: { setJwt, setUserType },
-        navigation
-      } = this.props;
 
-      AsyncStorage.multiSet(
-        [
-          ["@jwt", response.data.jwt],
-          ["@userType", "student"],
-          ["currentUser", JSON.stringify(response.data.user)]
-        ],
-        error => {
-          if (!error) {
-            setJwt(response.data.jwt);
-            setUserType("student");
+      this.setState({
+        isLoading: false
+      });
 
-            navigation.dispatch(
-              NavigationActions.reset({
-                index: 0,
-                key: null,
-                actions: [
-                  NavigationActions.navigate({
-                    routeName: "dashboard"
-                  })
-                ]
-              })
-            );
+      if (response.data) {
+        Toast.show({
+          text: "Login Successful",
+          buttonText: ""
+        });
+        let {
+          screenProps: { setJwt, setUserType },
+          navigation
+        } = this.props;
+
+        AsyncStorage.multiSet(
+          [
+            ["@jwt", response.data.jwt],
+            ["@userType", "student"],
+            ["currentUser", JSON.stringify(response.data.user)]
+          ],
+          error => {
+            if (!error) {
+              setJwt(response.data.jwt);
+              setUserType("student");
+
+              navigation.dispatch(
+                NavigationActions.reset({
+                  index: 0,
+                  key: null,
+                  actions: [
+                    NavigationActions.navigate({
+                      routeName: "dashboard"
+                    })
+                  ]
+                })
+              );
+            }
           }
-        }
-      );
-    } else {
+        );
+      } else {
+        Toast.show({
+          text: "Login Failed, Please check details and try again later",
+          buttonText: ""
+        });
+      }
+    } catch (e) {
+      this.setState({ isLoading: false });
       Toast.show({
-        text: "Login Failed, Please check details and try again later",
+        text: "Login Failed, Please check your network connection",
         buttonText: ""
       });
     }
@@ -87,6 +105,7 @@ class StudentLogin extends React.PureComponent {
     return (
       <Container style={styles.container}>
         <StatusBar />
+        {this.state.isLoading && <LoadingView />}
         <LayoutContainer style={styles.layoutContainer}>
           <Content>
             <Form
@@ -95,10 +114,7 @@ class StudentLogin extends React.PureComponent {
               hideFullNameField
             />
           </Content>
-          <Footer
-            onLogin={() => this.login()}
-            loginActive={true}
-          />
+          <Footer onLogin={() => this.login()} loginActive={true} />
         </LayoutContainer>
       </Container>
     );
@@ -107,9 +123,7 @@ class StudentLogin extends React.PureComponent {
 
 const _StudentLogin = props => (
   <ReduxContext.Consumer>
-    {({ screenProps }) => (
-      <StudentLogin {...props} screenProps={screenProps} />
-    )}
+    {({ screenProps }) => <StudentLogin {...props} screenProps={screenProps} />}
   </ReduxContext.Consumer>
 );
 

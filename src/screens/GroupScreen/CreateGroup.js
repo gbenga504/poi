@@ -54,32 +54,31 @@ class CreateGroup extends React.PureComponent {
       },
       navigation
     } = this.props;
-    const response = await createGroup({
+    let group = {
       title,
       description,
       projectId,
       students: students.map(student => student.id)
+    };
+
+    this.props.setGroups(group);
+    createGroup(group).then(response => {});
+    Toast.show({
+      text: `Group Created Successfully`,
+      buttonText: "Okay"
     });
-
-    if (response.data) {
-      Toast.show({
-        text: `Group Created Successfully`,
-        buttonText: "Okay"
-      });
-
-      navigation.dispatch(
-        NavigationActions.reset({
-          index: 0,
-          key: null,
-          actions: [
-            NavigationActions.navigate({
-              routeName: "viewGroups",
-              params: { project }
-            })
-          ]
-        })
-      );
-    }
+    navigation.dispatch(
+      NavigationActions.reset({
+        index: 0,
+        key: null,
+        actions: [
+          NavigationActions.navigate({
+            routeName: "viewGroups",
+            params: { project }
+          })
+        ]
+      })
+    );
   };
 
   render() {
@@ -165,7 +164,9 @@ function mapStateToProps(state) {
 
 const _CreateGroup = props => (
   <ReduxContext.Consumer>
-    {({ screenProps }) => <CreateGroup {...props} screenProps={screenProps} />}
+    {({ screenProps: { setGroups } }) => (
+      <CreateGroup {...props} setGroups={setGroups} />
+    )}
   </ReduxContext.Consumer>
 );
 

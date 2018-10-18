@@ -1,5 +1,5 @@
 import React from "react";
-import { Container } from "native-base";
+import { Container, Toast } from "native-base";
 import { View, AsyncStorage } from "react-native";
 import { connect } from "react-redux";
 
@@ -9,12 +9,22 @@ import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
 import _ from "lodash";
 import { projectGroups, studentProjectGroups } from "../../api/assessment";
+import ReduxContext from "../../context/ReduxContext";
+import RequestActivityIndicator from "../../components/RequestActivityIndicator";
 
 class ViewGroups extends React.PureComponent {
-  state = {
-    groups: [],
-    userType: ""
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: false,
+      groups:
+        Object.keys(props.group).length > 0
+          ? [{ name: props.group.title, ...props.group }]
+          : [],
+      userType: ""
+    };
+    this.props.setGroups({});
+  }
 
   async componentDidMount() {
     const userType = await AsyncStorage.getItem("@userType");
@@ -28,21 +38,34 @@ class ViewGroups extends React.PureComponent {
         }
       }
     } = this.props;
-    let response =
-      userType == "lecturer"
-        ? await projectGroups(id)
-        : await studentProjectGroups(id);
 
-    if (response.data) {
-      groups = response.data.data.map(group => ({
-        name: group.title,
-        ...group
-      }));
+    this.setState({ isLoading: true });
+
+    try {
+      let response =
+        userType == "lecturer"
+          ? await projectGroups(id)
+          : await studentProjectGroups(id);
+
+      if (response.data) {
+        groups = response.data.data.map(group => ({
+          name: group.title,
+          ...group
+        }));
+      }
+      this.setState({
+        userType,
+        groups,
+        isLoading: false
+      });
+    } catch (e) {
+      this.setState({ isLoading: false });
+      alert(e);
+      Toast.show({
+        text: `Please check your network connection`,
+        buttonText: "Okay"
+      });
     }
-    this.setState({
-      userType,
-      groups
-    });
   }
 
   generateActionButtons = group => {
@@ -82,15 +105,19 @@ class ViewGroups extends React.PureComponent {
       <View style={styles.container}>
         <Container>
           <AppHeader pageTitle={name} navigation={this.props.navigation} />
-          <LayoutContainer style={styles.bodyContainer}>
-            <InteractiveList
-              dataArray={this.state.groups}
-              items={this.state.groups}
-              onPress={group => navigate("viewLocation", { group })}
-              renderNullItem="No Groups Added Yet"
-              actionButtons={list => this.generateActionButtons(list)}
-            />
-          </LayoutContainer>
+          {this.state.groups.length == 0 && this.state.isLoading ? (
+            <RequestActivityIndicator />
+          ) : (
+            <LayoutContainer style={styles.bodyContainer}>
+              <InteractiveList
+                dataArray={this.state.groups}
+                items={this.state.groups}
+                onPress={group => navigate("viewLocation", { group })}
+                renderNullItem="No Groups Added Yet"
+                actionButtons={list => this.generateActionButtons(list)}
+              />
+            </LayoutContainer>
+          )}
           {this.props.userType == "lecturer" && (
             <AppFab
               onPress={() =>
@@ -110,12 +137,20 @@ class ViewGroups extends React.PureComponent {
 
 function mapStateToProps(state) {
   return {
-    groups: state.groups,
+    group: state.groups,
     userType: state.userType
   };
 }
 
-export default connect(mapStateToProps)(ViewGroups);
+const _ViewGroups = props => (
+  <ReduxContext.Consumer>
+    {({ screenProps: { setGroups } }) => (
+      <ViewGroups {...props} setGroups={setGroups} />
+    )}
+  </ReduxContext.Consumer>
+);
+
+export default connect(mapStateToProps)(_ViewGroups);
 
 const styles = {
   container: {

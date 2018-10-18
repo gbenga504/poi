@@ -19,3 +19,8 @@ export const setGroups = groups => ({
   type: types.SET_GROUPS,
   groups
 });
+
+export const setLocation = location => ({
+  type: types.SET_LOCATIONS,
+  location
+});

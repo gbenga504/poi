@@ -8,31 +8,24 @@ import LayoutContainer from "../../containers/LayoutContainer";
 import AppHeader from "../../components/AppHeader";
 import { MediumText } from "../../components/AppText";
 import { createLocation, updateLocation } from "../../api/assessment";
+import ReduxContext from "../../context/ReduxContext";
 
 class AddLocation extends React.PureComponent {
   save = async () => {
     // create location
+    this.props.setLocation(this.state);
     if (!this.state.id) {
-      const response = await createLocation(this.state);
-      if (response.data) {
-        Toast.show({
-          text: "Location added successfully",
-          buttonText: ""
-        });
-        this.handleSuccess();
-      }
+      createLocation(this.state).then(response => {});
     } else {
       // update location
       console.log("update called");
-      const response = await updateLocation(this.state);
-      if (response.data) {
-        Toast.show({
-          text: "Location updated successfully",
-          buttonText: ""
-        });
-        this.handleSuccess();
-      }
+      updateLocation(this.state).then(response => {});
     }
+    Toast.show({
+      text: `Location ${!this.state.id ? "saved" : "updated"} successfully`,
+      buttonText: ""
+    });
+    this.handleSuccess();
   };
 
   handleSuccess = () => {
@@ -212,7 +205,15 @@ function mapStateToProps(state) {
   };
 }
 
-export default connect(mapStateToProps)(AddLocation);
+const _AddLocation = props => (
+  <ReduxContext.Consumer>
+    {({ screenProps: { setLocation } }) => {
+      return <AddLocation {...props} setLocation={setLocation} />;
+    }}
+  </ReduxContext.Consumer>
+);
+
+export default connect(mapStateToProps)(_AddLocation);
 
 const styles = {
   container: {

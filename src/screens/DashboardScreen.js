@@ -10,32 +10,49 @@ import InteractiveList from "../components/InteractiveList";
 import ReduxContext from "../context/ReduxContext";
 import _ from "lodash";
 import { lecturerProjects, studentProjects } from "../api/assessment";
+import RequestActivityIndicator from "../components/RequestActivityIndicator";
 
 class DashboardScreen extends React.PureComponent {
   state = {
-    projects: []
+    projects: [],
+    isLoading: false
   };
 
   async componentDidMount() {
     const userType = await AsyncStorage.getItem("@userType");
-    if (userType == "lecturer") {
-      const response = await lecturerProjects();
-      if (response.data) {
-        const { data } = response.data;
-        this.setState({
-          projects: data.map(project => ({ name: project.title, ...project }))
-        });
+    this.setState({ isLoading: true });
+
+    try {
+      if (userType == "lecturer") {
+        const response = await lecturerProjects();
+        if (response.data) {
+          const { data } = response.data;
+          this.setState({
+            projects: data.map(project => ({
+              name: project.title,
+              ...project
+            })),
+            isLoading: false
+          });
+        }
+      } else {
+        await this.getStudentProjects();
       }
-    } else {
-      await this.getStudentProjects();
+    } catch (e) {
+      this.setState({ isLoading: false });
+      Toast.show({
+        text: `Please check your network connection`,
+        buttonText: "Okay"
+      });
     }
   }
 
   getStudentProjects = async () => {
-    const response = await studentProjects()
+    const response = await studentProjects();
     if (response.data) {
       const { data } = response.data;
       this.setState({
+        isLoading: false,
         projects: data.map(project => ({ name: project.title, ...project }))
       });
     }
@@ -75,19 +92,23 @@ class DashboardScreen extends React.PureComponent {
       <View style={styles.container}>
         <Container>
           <AppHeader navigation={this.props.navigation} pageTitle="Dashboard" />
-          <LayoutContainer style={styles.bodyContainer}>
-            <InteractiveList
-              dataArray={this.state.projects}
-              items={this.state.projects}
-              onPress={project => navigate("viewGroups", { project })}
-              renderNullItem="No Projects Added Yet"
-              actionButtons={
-                userType == "lecturer"
-                  ? list => this.generateActionButtons(list)
-                  : () => []
-              }
-            />
-          </LayoutContainer>
+          {this.state.isLoading ? (
+            <RequestActivityIndicator />
+          ) : (
+            <LayoutContainer style={styles.bodyContainer}>
+              <InteractiveList
+                dataArray={this.state.projects}
+                items={this.state.projects}
+                onPress={project => navigate("viewGroups", { project })}
+                renderNullItem="No Projects Added Yet"
+                actionButtons={
+                  userType == "lecturer"
+                    ? list => this.generateActionButtons(list)
+                    : () => []
+                }
+              />
+            </LayoutContainer>
+          )}
           {userType == "lecturer" && (
             <AppFab
               name="group-add"

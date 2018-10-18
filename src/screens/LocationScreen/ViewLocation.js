@@ -9,11 +9,29 @@ import AppFab from "../../components/AppFab";
 import InteractiveList from "../../components/InteractiveList";
 import _ from "lodash";
 import { groupLocations } from "../../api/assessment";
+import ReduxContext from "../../context/ReduxContext";
+import RequestActivityIndicator from "../../components/RequestActivityIndicator";
 
 class ViewLocation extends React.PureComponent {
-  state = {
-    locations: []
-  };
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoading: false,
+      locations:
+        Object.keys(props.location).length > 0
+          ? [
+              {
+                ...props.location,
+                name: `${props.location.elevation} - ${props.location.long} ${
+                  props.location.lat
+                }`
+              }
+            ]
+          : []
+    };
+    props.setLocation({});
+  }
+
   generateActionButtons = location => {
     if (this.props.userType == "lecturer") {
       return [];
@@ -21,6 +39,7 @@ class ViewLocation extends React.PureComponent {
       return [{ name: "Delete", onPress: () => alert("deleted") }];
     }
   };
+
   async componentDidMount() {
     let {
       navigation: {
@@ -29,14 +48,26 @@ class ViewLocation extends React.PureComponent {
         }
       }
     } = this.props;
-    const response = await groupLocations(group.id);
-    if (response.data) {
-      const { data } = response.data;
+    this.setState({ isLoading: true });
+    try {
+      const response = await groupLocations(group.id);
+      if (response.data) {
+        const { data } = response.data;
+        this.setState({
+          locations: data.map(location => ({
+            ...location,
+            name: `${location.elevation} - ${location.long} ${location.lat}`,
+            isLoading: false
+          }))
+        });
+      } else {
+        this.setState({
+          isLoading: false
+        });
+      }
+    } catch (e) {
       this.setState({
-        locations: data.map(location => ({
-          ...location,
-          name: `${location.elevation} - ${location.long} ${location.lat}`
-        }))
+        isLoading: false
       });
     }
   }
@@ -56,23 +87,27 @@ class ViewLocation extends React.PureComponent {
     return (
       <Container style={styles.container}>
         <AppHeader pageTitle={name} navigation={this.props.navigation} />
-        <Content>
-          <LayoutContainer style={styles.bodyContainer}>
-            <InteractiveList
-              dataArray={this.state.locations}
-              items={this.state.locations}
-              onPress={location =>
-                navigate("addLocation", {
-                  location: location,
-                  groupName: name,
-                  groupId: id
-                })
-              }
-              renderNullItem="No Location Added Yet"
-              actionButtons={list => this.generateActionButtons(list)}
-            />
-          </LayoutContainer>
-        </Content>
+        {this.state.locations.length == 0 && this.state.isLoading ? (
+          <RequestActivityIndicator />
+        ) : (
+          <Content>
+            <LayoutContainer style={styles.bodyContainer}>
+              <InteractiveList
+                dataArray={this.state.locations}
+                items={this.state.locations}
+                onPress={location =>
+                  navigate("addLocation", {
+                    location: location,
+                    groupName: name,
+                    groupId: id
+                  })
+                }
+                renderNullItem="No Location Added Yet"
+                actionButtons={list => this.generateActionButtons(list)}
+              />
+            </LayoutContainer>
+          </Content>
+        )}
         {this.props.userType != "lecturer" && (
           <AppFab
             name="add-location"
@@ -92,11 +127,20 @@ class ViewLocation extends React.PureComponent {
 
 function mapStateToProps(state) {
   return {
-    userType: state.userType
+    userType: state.userType,
+    location: state.location
   };
 }
 
-export default connect(mapStateToProps)(ViewLocation);
+const _ViewLocation = props => (
+  <ReduxContext.Consumer>
+    {({ screenProps: { setLocation } }) => (
+      <ViewLocation setLocation={setLocation} {...props} />
+    )}
+  </ReduxContext.Consumer>
+);
+
+export default connect(mapStateToProps)(_ViewLocation);
 
 const styles = {
   container: {
