@@ -80,6 +80,7 @@ class StudentLogin extends React.PureComponent {
         });
       }
     } catch (e) {
+      alert(e);
       this.setState({ isLoading: false });
       Toast.show({
         text: "Login Failed, Please check your network connection",

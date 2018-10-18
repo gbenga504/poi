@@ -54,11 +54,14 @@ class ViewLocation extends React.PureComponent {
       if (response.data) {
         const { data } = response.data;
         this.setState({
-          locations: data.map(location => ({
-            ...location,
-            name: `${location.elevation} - ${location.long} ${location.lat}`
-          })),
-          isLoading: false
+          isLoading: false,
+          locations: [
+            ...this.state.locations,
+            ...data.map(location => ({
+              ...location,
+              name: `${location.elevation} - ${location.long} ${location.lat}`
+            }))
+          ]
         });
       } else {
         this.setState({
@@ -83,6 +86,12 @@ class ViewLocation extends React.PureComponent {
         }
       }
     } = this.props;
+
+    console.log(
+      `The loading is ${this.state.isLoading} and the length is ${
+        this.state.locations.length
+      }`
+    );
 
     return (
       <Container style={styles.container}>
