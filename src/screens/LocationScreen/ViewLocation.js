@@ -56,9 +56,9 @@ class ViewLocation extends React.PureComponent {
         this.setState({
           locations: data.map(location => ({
             ...location,
-            name: `${location.elevation} - ${location.long} ${location.lat}`,
-            isLoading: false
-          }))
+            name: `${location.elevation} - ${location.long} ${location.lat}`
+          })),
+          isLoading: false
         });
       } else {
         this.setState({
