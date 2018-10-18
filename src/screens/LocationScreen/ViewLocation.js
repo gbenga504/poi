@@ -87,12 +87,6 @@ class ViewLocation extends React.PureComponent {
       }
     } = this.props;
 
-    console.log(
-      `The loading is ${this.state.isLoading} and the length is ${
-        this.state.locations.length
-      }`
-    );
-
     return (
       <Container style={styles.container}>
         <AppHeader pageTitle={name} navigation={this.props.navigation} />
