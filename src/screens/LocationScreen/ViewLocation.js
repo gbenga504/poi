@@ -16,20 +16,8 @@ class ViewLocation extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: false,
-      locations:
-        Object.keys(props.location).length > 0
-          ? [
-              {
-                ...props.location,
-                name: `${props.location.elevation} - ${props.location.long} ${
-                  props.location.lat
-                }`
-              }
-            ]
-          : []
+      isLoading: false
     };
-    props.setLocation({});
   }
 
   generateActionButtons = location => {
@@ -54,15 +42,10 @@ class ViewLocation extends React.PureComponent {
       if (response.data) {
         const { data } = response.data;
         this.setState({
-          isLoading: false,
-          locations: [
-            ...this.state.locations,
-            ...data.map(location => ({
-              ...location,
-              name: `${location.elevation} - ${location.long} ${location.lat}`
-            }))
-          ]
+          isLoading: false
         });
+
+        this.props.setLocation({ id: group.id, places: data });
       } else {
         this.setState({
           isLoading: false
@@ -90,14 +73,14 @@ class ViewLocation extends React.PureComponent {
     return (
       <Container style={styles.container}>
         <AppHeader pageTitle={name} navigation={this.props.navigation} />
-        {this.state.locations.length == 0 && this.state.isLoading ? (
+        {this.props.locations.length == 0 && this.state.isLoading ? (
           <RequestActivityIndicator />
         ) : (
           <Content>
             <LayoutContainer style={styles.bodyContainer}>
               <InteractiveList
-                dataArray={this.state.locations}
-                items={this.state.locations}
+                dataArray={this.props.locations}
+                items={this.props.locations}
                 onPress={location =>
                   navigate("addLocation", {
                     location: location,
@@ -128,10 +111,10 @@ class ViewLocation extends React.PureComponent {
   }
 }
 
-function mapStateToProps(state) {
+function mapStateToProps(state, ownProps) {
   return {
     userType: state.userType,
-    location: state.location
+    locations: state.locations[ownProps.navigation.state.params.group.id] || []
   };
 }
 

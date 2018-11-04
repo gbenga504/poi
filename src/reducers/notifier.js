@@ -44,10 +44,18 @@ export const groups = (state = [], action) => {
   }
 };
 
-export const location = (state = {}, action) => {
+export const locations = (state = {}, action) => {
   switch (action.type) {
     case types.SET_LOCATIONS:
-      return action.location;
+      let data = [];
+      action.locations.places.forEach(location => {
+        data.push({
+          ...location,
+          name: `${location.elevation} - ${location.long} ${location.lat}`
+        }); 
+      });
+      let prev = state[action.id] || [];
+      return { [action.id]: [...prev, ...data], ...state };
       break;
     default:
       return state;

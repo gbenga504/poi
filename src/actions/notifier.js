@@ -20,7 +20,7 @@ export const setGroups = groups => ({
   groups
 });
 
-export const setLocation = location => ({
+export const setLocation = locations => ({
   type: types.SET_LOCATIONS,
-  location
+  locations
 });

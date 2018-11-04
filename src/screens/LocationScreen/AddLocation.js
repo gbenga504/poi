@@ -13,7 +13,15 @@ import ReduxContext from "../../context/ReduxContext";
 class AddLocation extends React.PureComponent {
   save = async () => {
     // create location
-    this.props.setLocation(this.state);
+    let {
+      navigation: {
+        navigate,
+        state: {
+          params: { groupId, groupName }
+        }
+      }
+    } = this.props;
+    this.props.setLocation({ id: groupId, places: [this.state] });
     if (!this.state.id) {
       createLocation(this.state).then(response => {});
     } else {
